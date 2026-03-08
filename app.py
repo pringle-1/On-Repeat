@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/')
 # Define function that runs when route is served
 def home ():
-    return "On Repeat"
+    return "On Repeat Yet Again"
 # Run statement
 if __name__ == "__main__":
     app.run(debug=True)
