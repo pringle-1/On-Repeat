@@ -1,0 +1,5 @@
+/* import 'Be Vietnam' font for consistent text aesthetics throughout the interface */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro&display=swap');
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
