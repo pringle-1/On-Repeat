@@ -1,0 +1,26 @@
+-- database: ./onrepeat.db
+
+CREATE TABLE `User` (
+  `user_id` INTEGER,
+  `username` TEXT,
+  `password` TEXT,
+  `user_bio` TEXT,
+  PRIMARY KEY (`user_id`)
+);
+
+CREATE TABLE `Album` (
+  `album_id` INTEGER,
+  `album_title` TEXT,
+  `release_year` INTEGER,
+  `album_cover` TEXT,
+  PRIMARY KEY (`album_id`)
+);
+
+CREATE TABLE `Comment` (
+  `user_id` INTEGER,
+  `album_id` INTEGER,
+  `comment_text` TEXT,
+  `comment_date` DATE,
+  FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`),
+  FOREIGN KEY (`album_id`) REFERENCES `Album`(`album_id`)
+);

@@ -11,6 +11,8 @@
     <link rel="icon" type="image/x-icon" href="static/images/favicon.png">
 </head>
 <body>
+    <a href="{{ url_for('home') }}"><img class="logo" src="static/images/favicon.png" alt = "On Repeat Logo"></a>
+    <!-- Logo that leads to the home page (index) when clicked. It will appear on every page -->
     <main>
         {% block content %}{% endblock %}
     </main>
