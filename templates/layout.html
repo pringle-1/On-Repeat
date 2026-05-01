@@ -11,8 +11,17 @@
     <link rel="icon" type="image/x-icon" href="static/images/favicon.png">
 </head>
 <body>
-    <a href="{{ url_for('home') }}"><img class="logo" src="static/images/favicon.png" alt = "On Repeat Logo"></a>
-    <!-- Logo that leads to the home page (index) when clicked. It will appear on every page -->
+    <header>
+        <a href="{{ url_for('home') }}"><img class="logo" src="static/images/logo.png" alt = "On Repeat Logo"></a>
+        <!-- Logo that leads to the home page (index) when clicked. It will appear on every page -->
+        <nav class="navbar">
+            <div class="navlinks">
+                <li><a href="{{ url_for('albums')}}" class="{% if active_page=='albums' %}active{% endif %}">Albums</a></li>
+                <li><a href="{{ url_for('artists')}}" class="{% if active_page=='artists' %}active{% endif %}">Artists</a></li>
+                <li><a href="{{ url_for('profile')}}" class="{% if active_page=='profile' %}active{% endif %}">My Profile</a></li>
+            </div>
+        </nav>
+    </header>
     <main>
         {% block content %}{% endblock %}
     </main>

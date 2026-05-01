@@ -23,10 +23,24 @@ def close_db(error):
 
 # Route for index (home) page
 @app.route('/')
-# Define function that runs when route is served
 def home():
     header_py="home"
     return render_template("index.html", header=header_py)
+# Route for albums page
+@app.route('/albums')
+def albums():
+    header_py="albums"
+    return render_template("albums.html", header=header_py)
+# Route for artists page
+@app.route('/artists')
+def artists():
+    header_py="artists"
+    return render_template("artists.html", header=header_py)
+# Route for my profile page
+@app.route('/profile')
+def profile():
+    header_py="profile"
+    return render_template("profile.html", header=header_py)
 # Run statement
 if __name__ == "__main__":
     app.run(debug=True)
