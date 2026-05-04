@@ -1,16 +1,45 @@
-/* import 'Be Vietnam' font for consistent text aesthetics throughout the interface */
+/* Import 'Be Vietnam' font for consistent text aesthetics throughout the interface */
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro&display=swap');
+/* Set the names of the colours in my colour palette */
+:root {
+    --primary-purple: #5E3984;
+    --primary-blue: #202F72;
+    --darker-blue: #172564;
+}
+/* Body, header, and footer elements: set colours, positions, margins, etc.  */
 body {
     font-family: 'Be Vietnam Pro', sans-serif;
 }
 header {
-    background: #202F72;
+    background-color: var(--primary-blue);
+}
+.logo {
+    max-width: 30vw;
+}
+body {
+    margin: 0;
 }
 .navbar .navlinks a {
     color: #FFFFFF;
     text-decoration: none;
     font-size: 3vw;
 }
+footer {
+    position: absolute;
+    width: 100%;
+    font-size: 2vw;
+    background-color: var(--darker-blue);
+    color: white;
+    text-align: center;
+    min-height: 30vh;
+}
+
+
+
+
+
+
+
 .welcome {
     text-decoration: underline;
     font-weight: normal;
