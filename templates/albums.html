@@ -3,6 +3,10 @@
 <!-- Set the page title that displays on the tab -->
 {% block title%}On Repeat - Albums{% endblock %}
 <!-- Albums page main content block -->
-
-{% block content %}
+{% block body %}
+    {% for album in albums %}
+        <div class="album">
+            <pre>{{ album }}</pre>
+        </div>
+    {% endfor %}
 {% endblock %}

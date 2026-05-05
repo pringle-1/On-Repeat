@@ -24,3 +24,5 @@ CREATE TABLE `Comment` (
   FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`),
   FOREIGN KEY (`album_id`) REFERENCES `Album`(`album_id`)
 );
+SELECT *
+FROM album

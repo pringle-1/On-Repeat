@@ -21,6 +21,13 @@ def close_db(error):
     if db is not None:
         db.close()
 
+# Function to pull data from the database with SQL queries
+def query_db(query, args=(), one=False):
+    cur = get_db().execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+
 # Route for index (home) page
 @app.route('/')
 def home():
@@ -29,8 +36,14 @@ def home():
 # Route for albums page
 @app.route('/albums')
 def albums():
+    # Run SQL query to get all albums and their details
+    sql = """
+            SELECT *
+            FROM album
+            """
+    albums = query_db(sql)
     header_py="albums"
-    return render_template("albums.html", header=header_py)
+    return render_template("albums.html", header=header_py, albums=albums)
 # Route for artists page
 @app.route('/artists')
 def artists():
