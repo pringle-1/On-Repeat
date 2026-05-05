@@ -45,8 +45,19 @@ def albums():
     
     albums = query_db(sql)
     header_py="albums"
-    return render_template("albums.html", header=header_py, albums=albums, request=request)
+    return render_template("albums.html", header=header_py, albums=albums)
 
+# Route for one album's page
+@app.route('/album/<int:id>')
+def album(id):
+    # Only one album from its ID
+    sql = """
+                SELECT *
+                FROM album
+                WHERE album_id = ?;
+          """
+    album = query_db(sql,(id,),True)
+    return render_template("album.html", album=album)
 # Route for artists page
 @app.route('/artists')
 def artists():

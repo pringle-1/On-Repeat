@@ -12,7 +12,7 @@
 </head>
 <body>
     <header>
-        <a href="{{ url_for('home') }}"><img class="logo" src="static/images/logo.png" alt = "On Repeat Logo"></a>
+        <a href="{{ url_for('home') }}"><img class="logo" src="{{ url_for('static', filename='images/logo.png')}}" alt = "On Repeat Logo"></a>
         <!-- Logo that leads to the home page (index) when clicked. It will appear on every page -->
         <nav class="navbar">
             <!-- Navbar of clickable links to other pages -->

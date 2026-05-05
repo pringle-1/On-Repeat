@@ -1,0 +1,11 @@
+<!-- Extend the layout.html file onto the albums page -->
+{% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title%}On Repeat - {{ album['album_title'] }}{% endblock %}
+<!-- One album page main content block -->
+{% block content %}
+<!-- Data display -->
+    <h1>{{ album['album_title'] }}</h1>
+    <p> Release Year: {{ album['release_year'] }}</p>
+    <img src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
+{% endblock %}

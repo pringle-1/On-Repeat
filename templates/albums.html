@@ -6,9 +6,9 @@
 {% block content %}
 <!-- Data display -->
         {% for album in albums %}
-            <a href="{{ url_for('albums',id=album['album_id']) }}">
+            <a href="{{ url_for('album',id=album['album_id']) }}">
                 <!-- Album name then album cover -->
-                <h1 style="text-align: center;">{{ album['album_title'] }}</h1>
+                <h1>{{ album['album_title'] }}</h1>
                 <img src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
             </a>
         {% endfor %}
