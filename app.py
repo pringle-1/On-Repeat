@@ -33,27 +33,32 @@ def query_db(query, args=(), one=False):
 def home():
     header_py="home"
     return render_template("index.html", header=header_py)
+
 # Route for albums page
 @app.route('/albums')
 def albums():
-    # Run SQL query to get all albums and their details
+    # Run SQL query to get albums and all their details
     sql = """
-            SELECT *
-            FROM album
-            """
+                SELECT *
+                FROM album;
+          """
+    
     albums = query_db(sql)
     header_py="albums"
-    return render_template("albums.html", header=header_py, albums=albums)
+    return render_template("albums.html", header=header_py, albums=albums, request=request)
+
 # Route for artists page
 @app.route('/artists')
 def artists():
     header_py="artists"
     return render_template("artists.html", header=header_py)
+
 # Route for my profile page
 @app.route('/profile')
 def profile():
     header_py="profile"
     return render_template("profile.html", header=header_py)
+
 # Run statement
 if __name__ == "__main__":
     app.run(debug=True)

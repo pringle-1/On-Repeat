@@ -3,10 +3,13 @@
 <!-- Set the page title that displays on the tab -->
 {% block title%}On Repeat - Albums{% endblock %}
 <!-- Albums page main content block -->
-{% block body %}
-    {% for album in albums %}
-        <div class="album">
-            <pre>{{ album }}</pre>
-        </div>
-    {% endfor %}
+{% block content %}
+<!-- Data display -->
+        {% for album in albums %}
+            <a href="{{ url_for('albums',id=albums[0]) }}">
+                <!-- Album name then album cover -->
+                <h1 style="text-align: center;">{{ album['album_title'] }}</h1>
+                <img src="{{ album['album_cover']}}" alt="{{ album['album_title'] }}">
+            </a>
+        {% endfor %}
 {% endblock %}
