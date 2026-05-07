@@ -1,5 +1,10 @@
+"""On Repeat 12DTP Social Music Website/Application
+A site that allows users to review albums, comment on reviews, and reply to comments
+Fibitius Chan"""
+
 # Import models
 from flask import Flask, render_template, request, redirect, url_for, session, g
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 # Create app instance and secret key
 app = Flask(__name__)
@@ -27,6 +32,27 @@ def query_db(query, args=(), one=False):
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
+
+# Route for register (account creation) page
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username=request.form['username']
+        password=request.form['password']
+        hashed_password = generate_password_hash
+        db = get_db
+        try:
+            db.execute('INSERT INTO User (username, password) VALUES (?, ?)', (username, hashed_password))
+            db.commit()
+            return redirect(url_for('login'))
+        except:
+            return render_template("register.html", error="Username already taken!")
+    return render_template
+
+# Route for login (page)
+@app.route('/login')
+def login():
+    return render_template("login.html")
 
 # Route for index (home) page
 @app.route('/')
