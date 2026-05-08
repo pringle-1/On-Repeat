@@ -1,6 +1,5 @@
 """On Repeat 12DTP Social Music Website/Application
-A site that allows users to review albums, comment on reviews, and reply to comments
-Fibitius Chan"""
+A site that allows users to review albums, comment on reviews, and reply to comments"""
 
 # Import models
 from flask import Flask, render_template, request, redirect, url_for, session, g
@@ -76,46 +75,35 @@ def logout():
 # Route for index (home) page
 @app.route('/')
 def home():
-    header_py="home"
-    return render_template("index.html", header=header_py)
+    return render_template("index.html", active_page="home")
 
 # Route for albums page
 @app.route('/albums')
 def albums():
     # Run SQL query to get albums and all their details
-    sql = """
-                SELECT *
-                FROM album;
-          """
-    
+    sql = """SELECT * FROM album;"""
     albums = query_db(sql)
-    header_py="albums"
-    return render_template("albums.html", header=header_py, albums=albums)
+    return render_template("albums.html", active_page="albums", albums=albums)
 
 # Route for one album's page
 @app.route('/album/<int:id>')
 def album(id):
     # Only one album from its ID
-    sql = """
-                SELECT *
-                FROM album
-                WHERE album_id = ?;
-          """
+    sql = """ SELECT * FROM album WHERE album_id = ?;"""
     album = query_db(sql,(id,),True)
     return render_template("album.html", album=album)
+
 # Route for artists page
 @app.route('/artists')
 def artists():
-    header_py="artists"
-    return render_template("artists.html", header=header_py)
+    return render_template("artists.html", active_page="artists")
 
 # Route for my profile page
 @app.route('/profile')
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    header_py="profile"
-    return render_template("profile.html", header=header_py)
+    return render_template("profile.html", active_page="profile")
 
 # Run statement
 if __name__ == "__main__":

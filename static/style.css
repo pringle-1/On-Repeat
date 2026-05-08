@@ -1,26 +1,28 @@
 /* Import 'Be Vietnam' font for consistent text aesthetics throughout the interface */
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro&display=swap');
-/* Set the names of the colours in my colour palette */
+/* Colour Palette */
 :root {
     --primary-purple: #5E3984;
     --primary-blue: #202F72;
     --darker-blue: #172564;
+    --darker-purple: #53118F;
+    --lighter-purple: #7843CF;
+    --border-purple: #9064DF;
 }
-/* Body, header, and footer elements: set colours, positions, margins, etc.  */
+/* Global Body: colours, positions, margins, etc.  */
 body {
     font-family: 'Be Vietnam Pro', sans-serif;
+    margin: 0;
 }
+/* Layout */
 header {
     background-color: var(--primary-blue);
 }
 .logo {
     max-width: 30vw;
 }
-body {
-    margin: 0;
-}
 .navbar .navlinks a {
-    color: #FFFFFF;
+    color: white;
     text-decoration: none;
     font-size: 3vw;
 }
@@ -33,14 +35,74 @@ footer {
     text-align: center;
     min-height: 30vh;
 }
-
-
-
-
-
-
-
-.welcome {
-    text-decoration: underline;
-    font-weight: normal;
+/* Login and Register Styling (Authentication Pages) */
+.auth-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--primary-purple);
+}
+.auth-card {
+    text-align: center;
+    padding: 8vh 3vw;
+    color: white;
+    border: 8px solid black;
+    border-radius: 10px;
+    background-color: var(--lighter-purple);
+}
+.auth-title {
+    font-size: 5vw;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 1vh;
+}
+.input-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 1vh;
+}
+.auth-input {
+    margin: 0;
+    padding-left: 0.5vw;
+    color: white;
+    background: transparent;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    min-height: 5vh;
+    width: 100%;
+    border: 3px solid var(--border-purple);
+    border-radius: 50px;
+}
+.auth-input::placeholder {
+    color: white;
+    font-size: 1vw;
+}
+.auth-input:focus {
+    outline: none;
+}
+.input-icon {
+    position: absolute;
+    max-width: 2vw;
+    transform: translateY(-50%);
+    right: 0.5vw;
+    top: 50%;
+}
+.auth-button {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    width: 100%;
+    border: none;
+    font-size: 2vw;
+    min-height: 5vh;
+    padding: 1.5vh;
+    margin-top: 1vh;
+    color: black;
+    background-color: white;
+    border-radius: 50px;
+    cursor: pointer;
+}
+.auth-button:hover {
+    background-color: #E0E0E0;
+}
+.auth-card-link {
+    color: var(--primary-purple);
 }

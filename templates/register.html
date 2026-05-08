@@ -1,25 +1,35 @@
+<!-- Single page for account creations, won't extend layout.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>On Repeat - Register</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
 </head>
-<body>
-    <div class="register-card">
-        <h1>Register</h1>
+<body class="auth-body">
+    <div class="auth-card">
+        <h1 class="auth-title">Register</h1>
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
         <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-            <button type="submit">Register</button>
+            <div class="input-wrapper">
+                <input class="auth-input" type="text" name="username" placeholder="Username" required>
+                <img class="input-icon" src="{{ url_for('static', filename='images/user.png') }}" alt="user icon">
+            </div>
+            <div class="input-wrapper">
+                <input class="auth-input" type="password" name="password" placeholder="Password" required>
+                <img class="input-icon" src="{{ url_for('static', filename='images/lock.png') }}" alt="lock icon">
+            </div>
+            <div class="input-wrapper">
+                <input class="auth-input" type="password" name="confirm_password" placeholder="Confirm Password" required>
+                <img class="input-icon" src="{{ url_for('static', filename='images/tick.png') }}" alt="tick icon">
+            </div>
+            <button class="auth-button" type="submit">Register</button>
         </form>
-        <p>Already have an account? <a href="{{ url_for('login') }}">Login here!</a></p>
+        <p>Already have an account? <a class="auth-card-link" href="{{ url_for('login') }}">Login here!</a></p>
     </div>
 </body>
 </html>
