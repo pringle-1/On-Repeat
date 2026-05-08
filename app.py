@@ -39,15 +39,17 @@ def register():
     if request.method == 'POST':
         username=request.form['username']
         password=request.form['password']
-        hashed_password = generate_password_hash
-        db = get_db
+        if request.form['password'] != request.form['confirm_password']:
+            return render_template("register.html", error="Passwords do not match!")
+        hashed_password = generate_password_hash(password)
+        db = get_db()
         try:
             db.execute('INSERT INTO User (username, password) VALUES (?, ?)', (username, hashed_password))
             db.commit()
             return redirect(url_for('login'))
         except:
             return render_template("register.html", error="Username already taken!")
-    return render_template
+    return render_template("register.html")
 
 # Route for login (page)
 @app.route('/login')

@@ -8,7 +8,7 @@
     <title>{% block title %}{% endblock %}</title>
     <!-- Link the CSS file to the layout file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
-    <link rel="icon" type="image/x-icon" href="static/images/favicon.png">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.png') }}">
 </head>
 <body>
     <header>
