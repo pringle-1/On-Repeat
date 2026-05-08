@@ -8,6 +8,7 @@
     --darker-purple: #53118F;
     --lighter-purple: #7843CF;
     --border-purple: #9064DF;
+    --dark-gray: #2A2A2A;
 }
 /* Global Body: colours, positions, margins, etc.  */
 body {
@@ -95,7 +96,7 @@ footer {
     min-height: 5vh;
     padding: 1.5vh;
     margin-top: 1vh;
-    color: black;
+    color: var(--dark-gray);
     background-color: white;
     border-radius: 50px;
     cursor: pointer;
