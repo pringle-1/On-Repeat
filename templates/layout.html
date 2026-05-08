@@ -19,7 +19,13 @@
             <div class="navlinks">
                 <li><a href="{{ url_for('albums')}}" class="{% if active_page=='albums' %}active{% endif %}">Albums</a></li>
                 <li><a href="{{ url_for('artists')}}" class="{% if active_page=='artists' %}active{% endif %}">Artists</a></li>
-                <li><a href="{{ url_for('profile')}}" class="{% if active_page=='profile' %}active{% endif %}">My Profile</a></li>
+                {% if session['user_id'] %}
+                    <li><a href="{{ url_for('profile') }}">My Profile</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}" class="{% if active_page=='profile' %}active{% endif %}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
             </div>
         </nav>
     </header>

@@ -37,8 +37,8 @@ def query_db(query, args=(), one=False):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username=request.form['username']
-        password=request.form['password']
+        username = request.form['username']
+        password = request.form['password']
         if request.form['password'] != request.form['confirm_password']:
             return render_template("register.html", error="Passwords do not match!")
         hashed_password = generate_password_hash(password)
@@ -52,9 +52,26 @@ def register():
     return render_template("register.html")
 
 # Route for login (page)
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = query_db('SELECT * FROM user WHERE username = ?', (username,), one=True)
+        if user is None:
+            return render_template("login.html", error="Username not found!")
+        if not check_password_hash(user['password'], password):
+            return render_template("login.html", error="Incorrect password!")
+        session['user_id'] = user['user_id']
+        session['username'] = user['username']
+        return redirect(url_for('home'))
     return render_template("login.html")
+
+# Route for logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
 
 # Route for index (home) page
 @app.route('/')
