@@ -1,4 +1,5 @@
 -- database: ./onrepeat.db
+--Create DB tables
 CREATE TABLE `User` (
   `user_id` INTEGER,
   `username` TEXT,
@@ -25,3 +26,7 @@ CREATE TABLE `Comment` (
 --Select all albums
 SELECT *
 FROM album;
+--Create an account
+INSERT INTO User (username, password) VALUES (?, ?), (username, hashed_password);
+--Login to account
+SELECT * FROM user WHERE username = ?', (username,), one=True

@@ -112,6 +112,8 @@ def artists():
 # Route for my profile page
 @app.route('/profile')
 def profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
     header_py="profile"
     return render_template("profile.html", header=header_py)
 
