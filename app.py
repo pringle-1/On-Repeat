@@ -103,7 +103,8 @@ def artists():
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template("profile.html", active_page="profile")
+    user = query_db("SELECT * FROM User WHERE user_id = ?", (session['user_id'],), one=True)
+    return render_template("profile.html", user=user, active_page="profile")
 
 # Run statement
 if __name__ == "__main__":

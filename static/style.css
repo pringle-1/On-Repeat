@@ -107,3 +107,21 @@ footer {
 .auth-card-link {
     color: var(--primary-purple);
 }
+
+/* Account Information Styling (My Profile Page) */
+.profile-container {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+.profile-card {
+    margin: 5vh 0;
+    padding: 10vh 3vw;
+    width: 50vw;
+    text-align: center;
+    border: 5px solid black;
+    border-radius: 35px;
+}
+.username {
+    text-decoration: underline;
+}

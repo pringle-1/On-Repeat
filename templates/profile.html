@@ -3,6 +3,18 @@
 <!-- Set the page title that displays on the tab -->
 {% block title%}On Repeat - My Profile{% endblock %}
 <!-- Profile page main content block -->
-
 {% block content %}
+<!-- Card for account information -->
+<div class="profile-container">
+    <div class="profile-card">
+        {% if user['profile_picture'] %}
+            <img src="{{ url_for('static', filename='images/' + user['profile_picture'])}}" alt="{{ user['username'] }}">
+        {% else %}
+            <img src="{{ url_for('static', filename='images/profile_placeholder.png') }}" alt="No profile picture">
+        {% endif %}
+        <h1 class="username">{{ user['username'] }} (User ID: {{ user['user_id'] }})</h1>
+        <h2 class="join-date">Date Joined: {{ user['date_joined'] }}</h2>
+        <h3 class="bio">{{ user['user_bio'] }}</h3>
+    </div>
+</div>
 {% endblock %}
