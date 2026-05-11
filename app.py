@@ -72,6 +72,14 @@ def logout():
     session.clear()
     return redirect(url_for('home'))
 
+# Make the data of the current logged in user available to all templates
+@app.context_processor
+def inject_user():
+    user = None
+    if 'user_id' in session:
+        user = query_db("SELECT * FROM User WHERE user_id = ?", (session['user_id'],), one=True)
+    return dict(current_user=user)
+
 # Route for index (home) page
 @app.route('/')
 def home():
@@ -103,8 +111,7 @@ def artists():
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    user = query_db("SELECT * FROM User WHERE user_id = ?", (session['user_id'],), one=True)
-    return render_template("profile.html", user=user, active_page="profile")
+    return render_template("profile.html", active_page="profile")
 
 # Run statement
 if __name__ == "__main__":

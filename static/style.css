@@ -15,17 +15,36 @@ body {
     font-family: 'Be Vietnam Pro', sans-serif;
     margin: 0;
 }
+body::-webkit-scrollbar {
+    display: none;
+}
 /* Layout */
 header {
     background-color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1vh 2vw;
 }
 .logo {
     max-width: 30vw;
+}
+.navbar .navlinks {
+    list-style: none;
+    display: flex;
+    gap: 3vw;
 }
 .navbar .navlinks a {
     color: white;
     text-decoration: none;
     font-size: 3vw;
+}
+.profile-button {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--darker-blue);
+    object-fit: cover;
 }
 footer {
     position: absolute;
@@ -121,6 +140,18 @@ footer {
     text-align: center;
     border: 5px solid black;
     border-radius: 35px;
+}
+.profile-picture {
+    width: 300px;
+    height: 300px;
+    border-radius: 2vw;
+    object-fit: cover;
+}
+.profile-info {
+    display: flex;
+    gap: 3vw;
+    align-items: flex-start;
+    text-align: left;
 }
 .username {
     text-decoration: underline;

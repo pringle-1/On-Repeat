@@ -12,7 +12,7 @@
 </head>
 <body>
     <header>
-        <a href="{{ url_for('home') }}"><img class="logo" src="{{ url_for('static', filename='images/logo.png')}}" alt = "On Repeat Logo"></a>
+        <a href="{{ url_for('home') }}"><img class="logo" src="{{ url_for('static', filename='images/logo.png')}}" alt="On Repeat Logo"></a>
         <!-- Logo that leads to the home page (index) when clicked. It will appear on every page -->
         <nav class="navbar">
             <!-- Navbar of clickable links to other pages -->
@@ -20,8 +20,18 @@
                 <li><a href="{{ url_for('albums')}}" class="{% if active_page=='albums' %}active{% endif %}">Albums</a></li>
                 <li><a href="{{ url_for('artists')}}" class="{% if active_page=='artists' %}active{% endif %}">Artists</a></li>
                 {% if session['user_id'] %}
-                    <li><a href="{{ url_for('profile') }}">My Profile</a></li>
-                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    <li>
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('profile') }}">
+                            {% if current_user['profile_picture'] %}
+                                <img class="profile-button" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ user['username'] }}"></a></li>
+                            {% else %}
+                                <img class="profile-button" src="{{ url_for('static', filename='images/profile_placeholder.png') }}" alt="No profile picture">
+                            {% endif %}
+                            </a>
+                            </li>
                 {% else %}
                     <li><a href="{{ url_for('login') }}" class="{% if active_page=='profile' %}active{% endif %}">Login</a></li>
                     <li><a href="{{ url_for('register') }}">Register</a></li>

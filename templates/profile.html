@@ -7,14 +7,20 @@
 <!-- Card for account information -->
 <div class="profile-container">
     <div class="profile-card">
-        {% if user['profile_picture'] %}
-            <img src="{{ url_for('static', filename='images/' + user['profile_picture'])}}" alt="{{ user['username'] }}">
-        {% else %}
-            <img src="{{ url_for('static', filename='images/profile_placeholder.png') }}" alt="No profile picture">
-        {% endif %}
-        <h1 class="username">{{ user['username'] }} (User ID: {{ user['user_id'] }})</h1>
-        <h2 class="join-date">Date Joined: {{ user['date_joined'] }}</h2>
-        <h3 class="bio">{{ user['user_bio'] }}</h3>
+        <h1 class="username">{{ current_user['username'] }} (User ID: {{ current_user['user_id'] }})</h1>
+        <div class="profile-info">
+            <div class="profile-left">
+                {% if current_user['profile_picture'] %}
+                    <img class="profile-picture" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}">
+                {% else %}
+                    <img class="profile-picture" src="{{ url_for('static', filename='images/profile_placeholder.png') }}" alt="No profile picture">
+                {% endif %}
+            </div>
+            <div class="profile-right">
+                <h2 class="join-date">Date Joined: {{ current_user['date_joined'] }}</h2>
+                <h3 class="bio">About Me: <em>{{ current_user['user_bio'] }}</em></h3>
+            </div>
+         </div>
     </div>
 </div>
 {% endblock %}
