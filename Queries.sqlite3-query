@@ -1,5 +1,9 @@
--- database: ./onrepeat.db
---Create DB tables
+-- Queries used in On Repeat
+-- Database: ./onrepeat.db
+
+-- TABLE CREATION --
+
+-- Create User table to store account info
 CREATE TABLE `User` (
   `user_id` INTEGER,
   `username` TEXT,
@@ -7,6 +11,7 @@ CREATE TABLE `User` (
   `user_bio` TEXT,
   PRIMARY KEY (`user_id`)
 );
+-- Create Album table to store album info
 CREATE TABLE `Album` (
   `album_id` INTEGER,
   `album_title` TEXT,
@@ -14,6 +19,7 @@ CREATE TABLE `Album` (
   `album_cover` TEXT,
   PRIMARY KEY (`album_id`)
 );
+-- Create Comment table to store comments on albums from users
 CREATE TABLE `Comment` (
   `user_id` INTEGER,
   `album_id` INTEGER,
@@ -23,10 +29,18 @@ CREATE TABLE `Comment` (
   FOREIGN KEY (`album_id`) REFERENCES `Album`(`album_id`)
 );
 
---Select all albums
-SELECT *
-FROM album;
---Create an account
-INSERT INTO User (username, password) VALUES (?, ?), (username, hashed_password);
---Login to account
-SELECT * FROM user WHERE username = ?', (username,), one=True
+-- SELECT QUERIES --
+
+-- Select an account and verify login credentials
+SELECT * FROM user WHERE username = ?;
+-- Select the data of the user currently logged in to display across all pages
+SELECT * FROM User WHERE user_id = ?;
+-- Select all albums to display on albums page
+SELECT * FROM album;
+--Select a single album by ID to display a page for it individually
+SELECT * FROM album WHERE album_id = ?;
+
+-- INSERT QUERIES --
+
+-- Insert user input into the database to create a new account
+INSERT INTO User (username, password) VALUES (?, ?);
