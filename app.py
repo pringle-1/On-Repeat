@@ -2,7 +2,7 @@
 A site that allows users to review albums, comment on reviews, and reply to comments"""
 
 # Import models
-from flask import Flask, render_template, request, redirect, url_for, session, g
+from flask import Flask, render_template, request, redirect, url_for, session, g, abort
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
@@ -59,7 +59,7 @@ def login():
         password = request.form['password']
         user = query_db('SELECT * FROM user WHERE username = ?', (username,), one=True)
         if user is None:
-            return render_template("login.html", error="Username not found!")
+            return render_template("login.html", error="User not found!")
         if not check_password_hash(user['password'], password):
             return render_template("login.html", error="Incorrect password!")
         session['user_id'] = user['user_id']
@@ -105,6 +105,8 @@ def album(id):
     # Only one album from its ID
     sql = """SELECT * FROM album WHERE album_id = ?;"""
     album = query_db(sql,(id,),True)
+    if album is None:
+        abort(404)
     return render_template("album.html", album=album)
 
 # Route for artists page
@@ -121,6 +123,8 @@ def artist(id):
     # Only one artist from its ID
     sql = """SELECT * FROM artist WHERE artist_id = ?;"""
     artist = query_db(sql,(id,),True)
+    if artist is None:
+        abort(404)
     return render_template("artist.html", artist=artist)
 
 # Route for my profile page
