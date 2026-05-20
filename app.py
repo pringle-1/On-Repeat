@@ -73,6 +73,11 @@ def logout():
     session.clear()
     return redirect(url_for('home'))
 
+# Error 404 handler
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
+
 # Make the data of the current logged in user available to all templates
 @app.context_processor
 def inject_user():

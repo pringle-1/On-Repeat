@@ -1,0 +1,12 @@
+<!-- Extend the layout.html file onto the Error 404 page -->
+{% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title%}On Repeat - Page Not Found!{% endblock %}
+<!-- Error 404 page main content block -->
+{% block content %}
+<div class="error-container">
+    <h1 class="error-title">Error 404</h1>
+    <p class="error-message">Oops, this page doesn't exist!</p>
+    <a href="{{ url_for('home') }}" class="error-button">Go Home</a>
+</div>
+{% endblock %}
