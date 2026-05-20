@@ -12,6 +12,12 @@ app.secret_key = 'onrepeatsecretkey'
 
 DATABASE = 'onrepeat.db'
 
+# Open and read bannedwords.txt and badpasswords.txt
+with open('bannedwords.txt', 'r') as f:
+    BANNED_WORDS = [line.strip().lower() for line in f]
+with open('badpasswords.txt', 'r') as f:
+    BAD_PASSWORDS = [line.strip() for line in f]
+
 # Database connection function
 def get_db():
     if 'db' not in g:
@@ -45,8 +51,12 @@ def register():
             return render_template("register.html", error="Username must be 20 characters or less!")
         if len(password) < 8:
             return render_template("register.html", error="Password must be at least 8 characters!")
+        if password in BAD_PASSWORDS:
+            return render_template("register.html", error="That password is too common!\nPlease choose a stronger one.")
         if request.form['password'] != request.form['confirm_password']:
             return render_template("register.html", error="Passwords do not match!")
+        if any(word in username.lower() for word in BANNED_WORDS):
+            return render_template("register.html", error="That username is not allowed!")
         hashed_password = generate_password_hash(password)
         db = get_db()
         try:
