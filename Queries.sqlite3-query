@@ -28,17 +28,30 @@ CREATE TABLE `Comment` (
   FOREIGN KEY (`user_id`) REFERENCES `User`(`user_id`),
   FOREIGN KEY (`album_id`) REFERENCES `Album`(`album_id`)
 );
+-- Create Artist table to store artist info
+CREATE TABLE 'Artist' (
+    'artist_id' INTEGER,
+    'artist_name' TEXT,
+    'artist_bio' TEXT,
+    'artist_image' TEXT,
+    'formation_year' INTEGER,
+    PRIMARY KEY ('artist_id')
+);
 
 -- SELECT QUERIES --
 
 -- Select an account and verify login credentials
-SELECT * FROM user WHERE username = ?;
+SELECT * FROM User WHERE username = ?;
 -- Select the data of the user currently logged in to display across all pages
 SELECT * FROM User WHERE user_id = ?;
 -- Select all albums to display on albums page
-SELECT * FROM album;
---Select a single album by ID to display a page for it individually
-SELECT * FROM album WHERE album_id = ?;
+SELECT * FROM Album;
+-- Select a single album by ID to display a page for it individually
+SELECT * FROM Album WHERE album_id = ?;
+-- Select all artists to display on artists page
+SELECT * FROM Artist
+-- Select a single artist by ID to display a page for it individually
+SELECT * FROM Artist WHERE artist_id = ?;
 
 -- INSERT QUERIES --
 

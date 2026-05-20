@@ -5,4 +5,11 @@
 <!-- Artists page main content block -->
 
 {% block content %}
+<!-- Data display -->
+        {% for artist in artists %}
+            <a href="{{ url_for('artist',id=artist['artist_id']) }}">
+                <!-- Album name then album cover -->
+                <h1>{{ artist['artist_name'] }}</h1>
+            </a>
+        {% endfor %}
 {% endblock %}

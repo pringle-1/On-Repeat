@@ -29,6 +29,9 @@ header {
 .logo {
     max-width: 30vw;
 }
+.navbar .navlinks a.logout {
+    color: red;
+}
 .navbar .navlinks {
     list-style: none;
     display: flex;

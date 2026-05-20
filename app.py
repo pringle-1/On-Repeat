@@ -97,14 +97,25 @@ def albums():
 @app.route('/album/<int:id>')
 def album(id):
     # Only one album from its ID
-    sql = """ SELECT * FROM album WHERE album_id = ?;"""
+    sql = """SELECT * FROM album WHERE album_id = ?;"""
     album = query_db(sql,(id,),True)
     return render_template("album.html", album=album)
 
 # Route for artists page
 @app.route('/artists')
 def artists():
-    return render_template("artists.html", active_page="artists")
+    # Run SQL query to get artists and all their details
+    sql = """SELECT * FROM artist;"""
+    artists = query_db(sql)
+    return render_template("artists.html", active_page="artists", artists=artists)
+
+# Route for one artist's page
+@app.route('/artist/<int:id>')
+def artist(id):
+    # Only one artist from its ID
+    sql = """SELECT * FROM artist WHERE artist_id = ?;"""
+    artist = query_db(sql,(id,),True)
+    return render_template("artist.html", artist=artist)
 
 # Route for my profile page
 @app.route('/profile')
