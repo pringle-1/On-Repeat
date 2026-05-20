@@ -3,6 +3,7 @@ A site that allows users to review albums, comment on reviews, and reply to comm
 
 # Import models
 from flask import Flask, render_template, request, redirect, url_for, session, g
+from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 # Create app instance and secret key
@@ -43,7 +44,7 @@ def register():
         hashed_password = generate_password_hash(password)
         db = get_db()
         try:
-            db.execute('INSERT INTO User (username, password) VALUES (?, ?)', (username, hashed_password))
+            db.execute('INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)', (username, hashed_password, date.today().strftime('%d/%m/%Y')))
             db.commit()
             return redirect(url_for('login'))
         except:
