@@ -37,8 +37,14 @@ def query_db(query, args=(), one=False):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].lower()
         password = request.form['password']
+        if len(username) < 3:
+            return render_template("register.html", error="Username must be at least 3 characters!")
+        if len(username) > 20:
+            return render_template("register.html", error="Username must be 20 characters or less!")
+        if len(password) < 8:
+            return render_template("register.html", error="Password must be at least 8 characters!")
         if request.form['password'] != request.form['confirm_password']:
             return render_template("register.html", error="Passwords do not match!")
         hashed_password = generate_password_hash(password)
@@ -55,7 +61,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
+        username = request.form['username'].lower()
         password = request.form['password']
         user = query_db('SELECT * FROM user WHERE username = ?', (username,), one=True)
         if user is None:
