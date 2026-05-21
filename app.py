@@ -52,7 +52,7 @@ def register():
         if len(password) < 8:
             return render_template("register.html", error="Password must be at least 8 characters!")
         if password in BAD_PASSWORDS:
-            return render_template("register.html", error="That password is too common!\nPlease choose a stronger one.")
+            return render_template("register.html", error="Password too common, choose a stronger one!")
         if request.form['password'] != request.form['confirm_password']:
             return render_template("register.html", error="Passwords do not match!")
         if any(word in username.lower() for word in BANNED_WORDS):
