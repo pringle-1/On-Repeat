@@ -143,7 +143,8 @@ def artist(id):
     artist = query_db(sql,(id,),True)
     if artist is None:
         abort(404)
-    return render_template("artist.html", artist=artist)
+    albums = query_db("SELECT * FROM Album WHERE artist_id = ?", (id,))
+    return render_template("artist.html", artist=artist, albums=albums)
 
 # Route for my profile page
 @app.route('/profile')

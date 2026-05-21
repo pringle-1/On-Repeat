@@ -5,7 +5,20 @@
 <!-- One album page main content block -->
 {% block content %}
 <!-- Data display -->
-    <h1>{{ artist['artist_name'] }}</h1>
-    <p> Founding Year: {{ artist['formation_year'] }}</p>
-    <p> About Artist: {{ artist['artist_bio'] }}</p>
+<h1>{{ artist['artist_name'] }}</h1>
+<p> Founding Year: {{ artist['formation_year'] }}</p>
+<p> About Artist: {{ artist['artist_bio'] }}</p>
+<!-- Display all the albums by this particular artist -->
+<h2>
+    {{ artist['artist_name'] }}{% if artist['artist_name'].endswith('s') %}'{% else %}'s{% endif %} Discography</h2>
+{% if albums %}
+    {% for album in albums %}
+        <a href="{{ url_for('album', id=album['album_id']) }}">
+            <img src="{{ url_for('static', filename='images/' + album['album_cover']) }}" alt="{{ album['album_title'] }}">
+            <p>{{ album['album_title'] }} - {{ album['release_year'] }}</p>
+        </a>
+    {% endfor %}
+{% else %}
+    <p>No albums found for this artist.</p>
+{% endif %}
 {% endblock %}
