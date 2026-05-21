@@ -4,8 +4,18 @@
 {% block title%}On Repeat - {{ album['album_title'] }}{% endblock %}
 <!-- One album page main content block -->
 {% block content %}
-<!-- Data display -->
-    <h1>{{ album['album_title'] }}</h1>
-    <p> Release Year: {{ album['release_year'] }}</p>
-    <img src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
+<!-- Album cards -->
+<div class="album-container">
+    <div class="album-card">
+        <h1 class="album-header">{{ album['album_title'] }}</h1>
+        <div class="album-info">
+            <div class="album-left">
+                <img class="album-cover" src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
+            </div>
+            <div class="album-right">
+                 <p> Release Year: {{ album['release_year'] }}</p>  
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

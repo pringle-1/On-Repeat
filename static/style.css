@@ -183,3 +183,33 @@ footer {
 .username {
     text-decoration: underline;
 }
+/* Album Information Styling (Individual Album Page) */
+.album-container {
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+.album-card {
+    margin: 5vh 0;
+    padding: 10vh 3vw;
+    width: 50vw;
+    text-align: center;
+    border: 5px solid black;
+    border-radius: 35px;
+}
+.album-cover {
+    width: 300px;
+    height: 300px;
+    border-radius: 2vw;
+    object-fit: cover;
+    border: 3px solid black;
+}
+.album-info {
+    display: flex;
+    gap: 3vw;
+    align-items: flex-start;
+    text-align: left;
+}
+.album-header {
+    text-decoration: underline;
+}
