@@ -13,9 +13,9 @@
     {{ artist['artist_name'] }}{% if artist['artist_name'].endswith('s') %}'{% else %}'s{% endif %} Discography</h2>
 {% if albums %}
     {% for album in albums %}
+        <p>{{ album['album_title'] }} - {{ album['release_year'] }}</p>
         <a href="{{ url_for('album', id=album['album_id']) }}">
             <img src="{{ url_for('static', filename='images/' + album['album_cover']) }}" alt="{{ album['album_title'] }}">
-            <p>{{ album['album_title'] }} - {{ album['release_year'] }}</p>
         </a>
     {% endfor %}
 {% else %}
