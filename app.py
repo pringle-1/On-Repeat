@@ -49,14 +49,16 @@ def register():
             return render_template("register.html", error="Username must be at least 3 characters!")
         if len(username) > 20:
             return render_template("register.html", error="Username must be 20 characters or less!")
+        if ' ' in username:
+            return render_template("register.html", error="Username cannot contain spaces!")
+        if any(word in username.lower() for word in BANNED_WORDS):
+            return render_template("register.html", error="That username is not allowed!")
         if len(password) < 8:
             return render_template("register.html", error="Password must be at least 8 characters!")
         if password in BAD_PASSWORDS:
-            return render_template("register.html", error="Password too common, choose a stronger one!")
+            return render_template("register.html", error="Weak password, choose a stronger one!")
         if request.form['password'] != request.form['confirm_password']:
             return render_template("register.html", error="Passwords do not match!")
-        if any(word in username.lower() for word in BANNED_WORDS):
-            return render_template("register.html", error="That username is not allowed!")
         hashed_password = generate_password_hash(password)
         db = get_db()
         try:
