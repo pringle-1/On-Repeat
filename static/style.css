@@ -37,6 +37,15 @@ header {
     display: flex;
     gap: 3vw;
 }
+.navbar a:hover {
+    border-bottom: 5px solid white;
+}
+.navbar a.active {
+    background-color: var(--darker-blue);
+}
+.navbar a.active:hover {
+    background-color: var(--border-purple);
+}
 .navbar .navlinks a {
     color: white;
     text-decoration: none;
@@ -58,6 +67,18 @@ footer {
     text-align: center;
     min-height: 30vh;
 }
+
+/* Global Styling */
+img {
+    width: 100%;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+img:hover {
+    transition: transform 0.3s ease;
+    transform: scale(1.03);
+    opacity: 0.85;
+}
+
 /* Login and Register Styling (Authentication Pages) */
 .auth-body {
     display: flex;
@@ -130,7 +151,7 @@ footer {
     color: var(--primary-purple);
 }
 
-/* Error 404 Styling */
+/* Error 404 Page Styling */
 .error-container {
     display: flex;
     flex-direction: column;
@@ -183,6 +204,47 @@ footer {
 .username {
     text-decoration: underline;
 }
+
+/* Albums Page Styling */
+.album-page-header-container {
+    display: flex;
+    justify-content: center;
+}
+.album-page-header {
+    text-align: center;
+    color: white;
+    background-color: var(--lighter-purple);
+    width: 30vw;
+    height: 15vh;
+    font-size: 5vw;
+    border: 5px solid black;
+    border-radius: 20px;
+    margin-top: 1vh;
+}
+.albums-container {
+    background-color: var(--primary-purple);
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border: 5px solid black;
+    border-radius: 50px;
+    max-width: 80vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2em;
+    margin: 0 auto;
+    margin-bottom: 5vh;
+}
+.albums-card img {
+    max-width: 15vw;
+    border-radius: 35px;
+    overflow: hidden;
+    border: 5px solid black;
+}
+.albums-header {
+    color: white;
+}
+
 /* Album Information Styling (Individual Album Page) */
 .album-container {
     display: flex;
