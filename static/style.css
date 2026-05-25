@@ -205,12 +205,12 @@ img:hover {
     text-decoration: underline;
 }
 
-/* Albums Page Styling */
-.album-page-header-container {
+/* Content Styling (Albums Page and Artists Page) */
+.page-header-container {
     display: flex;
     justify-content: center;
 }
-.album-page-header {
+.page-header {
     text-align: center;
     color: white;
     background-color: var(--lighter-purple);
@@ -221,7 +221,7 @@ img:hover {
     border-radius: 20px;
     margin-top: 1vh;
 }
-.albums-container {
+.content-container {
     background-color: var(--primary-purple);
     text-align: center;
     justify-content: center;
@@ -235,17 +235,17 @@ img:hover {
     margin: 0 auto;
     margin-bottom: 5vh;
 }
-.albums-card img {
+.content-card img {
     max-width: 15vw;
     border-radius: 35px;
     overflow: hidden;
     border: 5px solid black;
 }
-.albums-header {
+.content-header {
     color: white;
 }
 
-/* Album Information Styling (Individual Album Page) */
+/* Information Styling (Individual Albums Page and Individual Artists Page) */
 .album-container {
     display: flex;
     justify-content: center;

@@ -5,15 +5,15 @@
 <!-- Albums page main content block -->
 {% block content %}
 <!-- Data display -->
-<div class="album-page-header-container">
-    <h1 class="album-page-header">Albums</h1>
+<div class="page-header-container">
+    <h1 class="page-header">Albums</h1>
 </div>
-<div class="albums-container">
+<div class="content-container">
         {% for album in albums %}
             <a href="{{ url_for('album',id=album['album_id']) }}">
                 <!-- Album name then album cover -->
-                <div class="albums-card">
-                    <h1 class="albums-header">{{ album['album_title'] }}</h1>
+                <div class="content-card">
+                    <h1 class="content-header">{{ album['album_title'] }}</h1>
                     <img src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
                 </div>
             </a>
