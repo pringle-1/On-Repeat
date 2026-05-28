@@ -68,6 +68,11 @@ footer {
     min-height: 30vh;
 }
 
+/* Index Styling (Home Page) */
+.welcome {
+    text-align: center;
+}
+
 /* Global Styling */
 img {
     width: 100%;

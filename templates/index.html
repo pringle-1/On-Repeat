@@ -6,8 +6,8 @@
 
 {% block content %}
 {% if current_user %}
-    <h1>Welcome to On Repeat, {{ current_user['username'] }}!</h1>
+    <h1 class="welcome">Welcome to On Repeat, {{ current_user['username'] }}!</h1>
 {% else %}
-    <h1>Welcome to On Repeat, Guest!</h1>
+    <h1 class="welcome">Welcome to On Repeat, Guest!</h1>
 {% endif %}
 {% endblock %}
