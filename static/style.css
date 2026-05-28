@@ -151,6 +151,11 @@ img:hover {
     color: var(--primary-purple);
 }
 
+/* Index Styling (Home Page) */
+.welcome {
+    text-align: center;
+}
+
 /* Error 404 Page Styling */
 .error-container {
     display: flex;
