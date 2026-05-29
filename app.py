@@ -107,7 +107,10 @@ def inject_user():
 # Route for index (home) page
 @app.route('/')
 def home():
-    return render_template("index.html", active_page="home")
+    # Run SQL query to get albums and all their details
+    sql = """SELECT * FROM album;"""
+    albums = query_db(sql)
+    return render_template("index.html", active_page="home", albums=albums)
 
 # Route for albums page
 @app.route('/albums')

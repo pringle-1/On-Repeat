@@ -67,21 +67,57 @@ footer {
     text-align: center;
     min-height: 30vh;
 }
+.copyright {
+    display: flex;
+    margin-left: 10vw;
+    margin-top: 12vh;
+}
 
 /* Index Styling (Home Page) */
 .welcome {
+    margin-left: 10vw;
+    text-decoration: underline;
+}
+.index-header {
+    grid-column: 1 / span 3;
+    justify-self: center;
     text-align: center;
+    height: 1vh;
+    width: 31vw;
+    color: white;
+    font-size: 4vw;
+    margin-top: 1vh;
+}
+.index-container {
+    background-color: var(--primary-purple);
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    border: 5px solid black;
+    border-radius: 50px;
+    max-width: 80vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2em;
+    margin: 0 auto 10vh auto;
+    padding: 20px;
+}
+.index-card-container {
+    background-color: var(--darker-blue);
+    border-radius: 35px;
+    border: 5px solid black;
+}
+.index-card-container img {
+    margin-bottom: 4vh;
+    max-width: 15vw;
+    border-radius: 35px;
+    overflow: hidden;
 }
 
 /* Global Styling */
 img {
     width: 100%;
     transition: transform 0.3s ease, opacity 0.3s ease;
-}
-img:hover {
-    transition: transform 0.3s ease;
-    transform: scale(1.03);
-    opacity: 0.85;
 }
 
 /* Login and Register Styling (Authentication Pages) */
@@ -154,11 +190,6 @@ img:hover {
 }
 .auth-card-link {
     color: var(--primary-purple);
-}
-
-/* Index Styling (Home Page) */
-.welcome {
-    text-align: center;
 }
 
 /* Error 404 Page Styling */
