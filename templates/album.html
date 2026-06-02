@@ -1,7 +1,7 @@
 <!-- Extend the layout.html file onto the albums page -->
 {% extends "layout.html" %}
 <!-- Set the page title that displays on the tab -->
-{% block title%}On Repeat - {{ album['album_title'] }}{% endblock %}
+{% block title %}On Repeat - {{ album['album_title'] }}{% endblock %}
 <!-- One album page main content block -->
 {% block content %}
 <!-- Album cards -->
@@ -13,7 +13,17 @@
                 <img class="album-cover" src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
             </div>
             <div class="album-right">
-                 <p> Release Year: {{ album['release_year'] }}</p>  
+                <p> Release Year: {{ album['release_year'] }}</p>
+                {% if current_user %}
+                    <a class="review-button" href="{{ url_for('review', id=album['album_id']) }}">
+                        Write a Review
+                    </a>
+                {% else %}
+                    <p>Login to leave a review</p>
+                {% endif %}
+                <a class="reviews-button" href="{{ url_for('review', id=album['album_id']) }}">
+                    Read Reviews
+                </a>
             </div>
         </div>
     </div>

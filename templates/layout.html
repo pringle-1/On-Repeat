@@ -19,14 +19,14 @@
             <div class="navlinks">
                 <li><a href="{{ url_for('albums')}}" class="{% if active_page=='albums' %}active{% endif %}">Albums</a></li>
                 <li><a href="{{ url_for('artists')}}" class="{% if active_page=='artists' %}active{% endif %}">Artists</a></li>
-                {% if session['user_id'] %}
+                {% if 'user_id' in session %}
                     <li>
                         <a class="logout" href="{{ url_for('logout') }}">Logout</a>
                     </li>
                     <li>
                         <a href="{{ url_for('profile') }}">
                             {% if current_user['profile_picture'] %}
-                                <img class="profile-button" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ user['username'] }}">
+                                <img class="profile-button" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}">
                             {% else %}
                                 <img class="profile-button" src="{{ url_for('static', filename='images/profile_placeholder.png') }}" alt="No profile picture">
                             {% endif %}

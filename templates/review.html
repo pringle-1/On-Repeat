@@ -1,0 +1,8 @@
+<!-- Extend the layout.html file onto the Review Creation page -->
+{% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title %}On Repeat - Review {{ album['album_title'] }}{% endblock %}
+<!-- Error 404 page main content block -->
+{% block content %}
+<h1>Review {{ album['album_title'] }}</h1>
+{% endblock %}
