@@ -140,6 +140,14 @@ def review(id):
         return redirect(url_for('login'))
     return render_template("review.html", album=album)
 
+@app.route('/album/<int:id>/reviews')
+def reviews(id):
+    sql = """SELECT * FROM Review WHERE album_id = ?;"""
+    album = query_db(sql,(id,),True)
+    if album is None:
+        abort(404)
+    return render_template("reviews.html", album=album)
+
 # Route for artists page
 @app.route('/artists')
 def artists():

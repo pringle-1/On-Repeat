@@ -18,7 +18,7 @@ body {
 body::-webkit-scrollbar {
     display: none;
 }
-/* Layout */
+/* Extendable Layout Styling */
 header {
     background-color: var(--primary-blue);
     display: flex;
@@ -73,7 +73,7 @@ footer {
     margin-top: 12vh;
 }
 
-/* Index Styling (Home Page) */
+/* Index Styling (home page) */
 .welcome {
     margin-left: 10vw;
     text-decoration: underline;
@@ -120,7 +120,7 @@ img {
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Login and Register Styling (Authentication Pages) */
+/* Authentication Styling (login and register pages) */
 .auth-body {
     display: flex;
     justify-content: center;
@@ -216,7 +216,7 @@ img {
     text-decoration: none;
 }
 
-/* Account Information Styling (My Profile Page) */
+/* Account Information Styling (my profile page) */
 .profile-container {
     display: flex;
     justify-content: center;
@@ -246,7 +246,7 @@ img {
     text-decoration: underline;
 }
 
-/* Content Styling (Albums Page and Artists Page) */
+/* Content Styling (albums page and artists page) */
 .page-header-container {
     display: flex;
     justify-content: center;
@@ -255,7 +255,7 @@ img {
     text-align: center;
     color: white;
     background-color: var(--lighter-purple);
-    width: 30vw;
+    width: 80vw;
     height: 12vh;
     font-size: 4vw;
     border: 5px solid black;
@@ -287,7 +287,7 @@ img {
     color: white;
 }
 
-/* Information Styling (Individual Albums Page and Individual Artists Page) */
+/* Information Styling (individual albums page and individual artists page) */
 .album-container {
     display: flex;
     justify-content: center;
@@ -316,4 +316,41 @@ img {
 }
 .album-header {
     text-decoration: underline;
+}
+.review-button {
+    color: black;
+    text-decoration: none;
+    padding: 1vw;
+    font-size: 2vw;
+    border: 5px solid black;
+    border-radius: 35px;
+}
+.reviews-button {
+    color: black;
+    text-decoration: none;
+    padding: 1vw;
+    font-size: 2vw;
+    border: 5px solid black;
+    border-radius: 35px;
+}
+.artist-info {
+    max-width: 80vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5vh auto;
+    border: 5px solid black;
+    border-radius: 35px;
+}
+.discography {
+    grid-column: 1 / span 3;
+    color: white;
+    font-size: 5vw;
+    text-decoration: underline;
+}
+
+/* Review Styling (Write a Review for an individual album page) */
+.review-container {
+    display: flex;
+    justify-content: center;
 }

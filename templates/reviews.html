@@ -1,0 +1,8 @@
+<!-- Extend the layout.html file onto the Read Reviews  page -->
+{% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title %}On Repeat - {{ album['album_title'] }} Reviews{% endblock %}
+<!-- Read Reviews page main content block -->
+{% block content %}
+<h1>Reviews for <em>{{ album['album_title'] }}</em></h1>
+{% endblock %}

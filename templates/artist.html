@@ -2,23 +2,31 @@
 {% extends "layout.html" %}
 <!-- Set the page title that displays on the tab -->
 {% block title %}On Repeat - {{ artist['artist_name'] }}{% endblock %}
-<!-- One album page main content block -->
+<!-- One artist page main content block -->
 {% block content %}
 <!-- Data display -->
-<h1>{{ artist['artist_name'] }}</h1>
-<p> Founding Year: {{ artist['formation_year'] }}</p>
-<p> About Artist: {{ artist['artist_bio'] }}</p>
-<!-- Display all the albums by this particular artist -->
-<h2>
-    {{ artist['artist_name'] }}{% if artist['artist_name'].endswith('s') %}'{% else %}'s{% endif %} Discography</h2>
-{% if albums %}
-    {% for album in albums %}
-        <p>{{ album['album_title'] }} - {{ album['release_year'] }}</p>
-        <a href="{{ url_for('album', id=album['album_id']) }}">
-            <img src="{{ url_for('static', filename='images/' + album['album_cover']) }}" alt="{{ album['album_title'] }}">
-        </a>
-    {% endfor %}
-{% else %}
-    <p>No albums found for this artist.</p>
-{% endif %}
+<div class="page-header-container">
+    <h1 class="page-header">{{ artist['artist_name'] }}</h1>
+</div>
+<div class="artist-info">
+    <p> Founding Year: {{ artist['formation_year'] }}</p>
+    <p> About Artist: {{ artist['artist_bio'] }}</p>
+</div>
+<div class="content-container">
+    <h2 class="discography">{{ artist['artist_name'] }}{% if artist['artist_name'].endswith('s') %}'{% else %}'s{% endif %} Discography</h2>
+    <!-- Display all the albums by this particular artist -->
+    {% if albums %}
+        {% for album in albums %}
+            <a href="{{ url_for('album',id=album['album_id']) }}">
+                <!-- Album name then album cover -->
+                <div class="content-card">
+                    <h1 class="content-header">{{ album['album_title'] }}</h1>
+                    <img src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
+                </div>
+            </a>
+        {% endfor %}
+    {% else %}
+        <p>No albums found for this artist.</p>
+    {% endif %}
+</div>
 {% endblock %}

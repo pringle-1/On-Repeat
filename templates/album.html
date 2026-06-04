@@ -7,21 +7,23 @@
 <!-- Album cards -->
 <div class="album-container">
     <div class="album-card">
-        <h1 class="album-header">{{ album['album_title'] }}</h1>
+        <h1 class="album-header">{{ album['album_title'] }} <em>({{ album['release_year'] }})</em></h1>
         <div class="album-info">
             <div class="album-left">
                 <img class="album-cover" src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
             </div>
             <div class="album-right">
-                <p> Release Year: {{ album['release_year'] }}</p>
+                <p>Artist: <em>{{ album['artist_id'] }}</em></p>
+                <p>Release Year: {{ album['release_year'] }}</p>
+                <p>Average Rating (placeholder): <em>{{ album['artist_id'] }}/10</em></p>
                 {% if current_user %}
                     <a class="review-button" href="{{ url_for('review', id=album['album_id']) }}">
                         Write a Review
-                    </a>
+                    </a><br>
                 {% else %}
-                    <p>Login to leave a review</p>
+                    <a class="review-button" href="{{ url_for('login') }}">Login to leave a review.</p><br>
                 {% endif %}
-                <a class="reviews-button" href="{{ url_for('review', id=album['album_id']) }}">
+                <a class="reviews-button" href="{{ url_for('reviews', id=album['album_id']) }}">
                     Read Reviews
                 </a>
             </div>
