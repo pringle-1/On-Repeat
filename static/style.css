@@ -106,6 +106,7 @@ footer {
     background-color: var(--darker-blue);
     border-radius: 35px;
     border: 5px solid black;
+    min-height: 50vh;
 }
 .index-card-container img {
     margin-bottom: 4vh;
@@ -284,6 +285,7 @@ img {
     border: 5px solid black;
 }
 .content-header {
+    font-size: 1.7vw;
     color: white;
 }
 
@@ -291,19 +293,22 @@ img {
 .album-container {
     display: flex;
     justify-content: center;
-    min-height: 100vh;
+    min-height: 90vh;
 }
 .album-card {
     margin: 5vh 0;
-    padding: 10vh 3vw;
-    width: 50vw;
+    width: 60vw;
     text-align: center;
     border: 5px solid black;
     border-radius: 35px;
 }
+.album-header {
+    text-decoration: underline;
+}
 .album-cover {
     width: 300px;
     height: 300px;
+    margin-left: 4vw;
     border-radius: 2vw;
     object-fit: cover;
     border: 3px solid black;
@@ -314,23 +319,21 @@ img {
     align-items: flex-start;
     text-align: left;
 }
-.album-header {
-    text-decoration: underline;
+.album-about {
+    width: 29vw;
 }
-.review-button {
+.review-buttons-container {
+    display: flex;
+    align-items: flex-start;
+    text-align: center;
+    gap: 1vw;
+}
+.review-buttons {
     color: black;
     text-decoration: none;
-    padding: 1vw;
-    font-size: 2vw;
-    border: 5px solid black;
-    border-radius: 35px;
-}
-.reviews-button {
-    color: black;
-    text-decoration: none;
-    padding: 1vw;
-    font-size: 2vw;
-    border: 5px solid black;
+    padding: 0.7vw;
+    font-size: 1.7vw;
+    border: 3px solid black;
     border-radius: 35px;
 }
 .artist-info {

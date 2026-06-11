@@ -130,6 +130,7 @@ def album(id):
         abort(404)
     return render_template("album.html", album=album)
 
+# Route to write an album review
 @app.route('/album/<int:id>/review', methods=['GET', 'POST'])
 def review(id):
     sql = """SELECT * FROM Album WHERE album_id = ?;"""
@@ -140,13 +141,16 @@ def review(id):
         return redirect(url_for('login'))
     return render_template("review.html", album=album)
 
+# Route to read the reviews for one album
 @app.route('/album/<int:id>/reviews')
 def reviews(id):
     sql = """SELECT * FROM Review WHERE album_id = ?;"""
-    album = query_db(sql,(id,),True)
+    albumsql = """SELECT * FROM Album WHERE album_id = ?"""
+    album = query_db(albumsql,(id,),True)
+    review = query_db(sql,(id,),True)
     if album is None:
         abort(404)
-    return render_template("reviews.html", album=album)
+    return render_template("reviews.html", album=album, review=review)
 
 # Route for artists page
 @app.route('/artists')

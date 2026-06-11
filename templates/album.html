@@ -13,19 +13,22 @@
                 <img class="album-cover" src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
             </div>
             <div class="album-right">
-                <p>Artist: <em>{{ album['artist_id'] }}</em></p>
-                <p>Release Year: {{ album['release_year'] }}</p>
-                <p>Average Rating (placeholder): <em>{{ album['artist_id'] }}/10</em></p>
-                {% if current_user %}
-                    <a class="review-button" href="{{ url_for('review', id=album['album_id']) }}">
-                        Write a Review
-                    </a><br>
-                {% else %}
-                    <a class="review-button" href="{{ url_for('login') }}">Login to leave a review.</p><br>
-                {% endif %}
-                <a class="reviews-button" href="{{ url_for('reviews', id=album['album_id']) }}">
-                    Read Reviews
-                </a>
+                <p>Artist: <b><em>{{ album['artist_id'] }}</em></b></p>
+                <p>Release Year: <b><em>{{ album['release_year'] }}</em></b></p>
+                <p>Average Rating (placeholder): <b><em>{{ album['album_id'] }}/10</em></b></p>
+                <p class="album-about">About Album: <b><em>{{ album['album_description'] }}</em></b></p>
+                <div class="review-buttons-container">
+                    {% if current_user %}
+                        <a class="review-buttons" href="{{ url_for('review', id=album['album_id']) }}">
+                            Write a Review
+                        </a><br>
+                    {% else %}
+                        <a class="review-buttons" href="{{ url_for('login') }}">Login to review</a>
+                    {% endif %}
+                    <a class="review-buttons" href="{{ url_for('reviews', id=album['album_id']) }}">
+                        Read Reviews
+                    </a>
+                </div>
             </div>
         </div>
     </div>
