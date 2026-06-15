@@ -124,7 +124,7 @@ def albums():
 @app.route('/album/<int:id>')
 def album(id):
     # Only one album from its ID
-    sql = """SELECT * FROM album WHERE album_id = ?;"""
+    sql = """SELECT * FROM album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
     album = query_db(sql,(id,),True)
     if album is None:
         abort(404)
@@ -147,7 +147,7 @@ def reviews(id):
     sql = """SELECT * FROM Review WHERE album_id = ?;"""
     albumsql = """SELECT * FROM Album WHERE album_id = ?"""
     album = query_db(albumsql,(id,),True)
-    review = query_db(sql,(id,),True)
+    review = query_db(sql,(id,))
     if album is None:
         abort(404)
     return render_template("reviews.html", album=album, review=review)

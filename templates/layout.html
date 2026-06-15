@@ -17,6 +17,7 @@
         <nav class="navbar">
             <!-- Navbar of clickable links to other pages -->
             <div class="navlinks">
+                <li><a href="{{ url_for('home') }}"><img class="home" src="{{ url_for('static', filename='images/home.png')}}" alt="Home Button"></a> 
                 <li><a href="{{ url_for('albums')}}" class="{% if active_page=='albums' %}active{% endif %}">Albums</a></li>
                 <li><a href="{{ url_for('artists')}}" class="{% if active_page=='artists' %}active{% endif %}">Artists</a></li>
                 {% if 'user_id' in session %}
