@@ -73,3 +73,8 @@ SELECT * FROM Album WHERE artist_id = ?;
 -- INSERT QUERIES --
 -- Insert user input into the database to create a new account
 INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?);
+
+-- TABLE ALTERATION --
+-- Alter the reviews table to have unique column combinations between user_id and album_id
+CREATE UNIQUE INDEX unique_column_combination
+ON Review(user_id, album_id);

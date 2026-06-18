@@ -5,4 +5,14 @@
 <!-- Read Reviews page main content block -->
 {% block content %}
 <h1>Reviews for <em>{{ album['album_title'] }}</em></h1>
+{% if reviews %}
+    {% for review in reviews %}
+        <h2>Reviewer: {{ review['username'] }}</h2>
+        <p>Rating: {{ review['rating'] }}/10</p>
+        <p>What they thought: {{ review['review_text'] }}</p>
+        <p>Date posted: {{ review['review_date']}}</p>
+    {% endfor %}
+{% else %}
+    <p>There are no reviews for this album yet!</p>
+{% endif %}
 {% endblock %}

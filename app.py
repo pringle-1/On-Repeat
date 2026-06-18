@@ -133,24 +133,34 @@ def album(id):
 # Route to write an album review
 @app.route('/album/<int:id>/review', methods=['GET', 'POST'])
 def review(id):
-    sql = """SELECT * FROM Album WHERE album_id = ?;"""
+    sql = """SELECT * FROM Album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
     album = query_db(sql,(id,),True)
     if album is None:
         abort(404)
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    if request.method == 'POST':
+        rating = request.form['rating']
+        review_text = request.form['review_text']
+        db = get_db()
+        try:
+            db.execute('INSERT INTO Review (user_id, album_id, rating, review_text, review_date) VALUES (?, ?, ?, ?, ?)', (session['user_id'], id, rating, review_text, date.today().strftime('%d/%m/%Y')))
+            db.commit()
+            return redirect(url_for('reviews', id=id))
+        except sqlite3.IntegrityError:
+            return render_template("review.html", album=album, error="You have already reviewed this album!")
     return render_template("review.html", album=album)
 
 # Route to read the reviews for one album
 @app.route('/album/<int:id>/reviews')
 def reviews(id):
-    sql = """SELECT * FROM Review WHERE album_id = ?;"""
+    sql = """SELECT Review.*, User.username FROM Review JOIN User ON Review.user_id = User.user_id WHERE album_id = ?;"""
     albumsql = """SELECT * FROM Album WHERE album_id = ?"""
-    album = query_db(albumsql,(id,),True)
-    review = query_db(sql,(id,))
+    album = query_db(albumsql,(id,), True)
+    reviews = query_db(sql,(id,))
     if album is None:
         abort(404)
-    return render_template("reviews.html", album=album, review=review)
+    return render_template("reviews.html", album=album, reviews=reviews)
 
 # Route for artists page
 @app.route('/artists')
