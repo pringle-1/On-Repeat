@@ -7,7 +7,7 @@
 <!-- Card for account information -->
 <div class="profile-container">
     <div class="profile-card">
-        <h1 class="username">{{ current_user['username'] }}</h1>
+        <h1 class="username">My Profile</h1>
         <div class="profile-info">
             <div class="profile-left">
                 <img class="profile-picture" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}">
@@ -17,6 +17,27 @@
                 <h3 class="bio">About Me: <em>{{ current_user['user_bio'] }}</em></h3>
             </div>
         </div>
+        <div class="profile-divider"></div>
+        <h1 class="profile-reviews-header">Reviews {{ reviews|length }}</h1>
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="profile-reviews">
+                    <div class="profile-reviews-left">
+                        <a href="{{ url_for('album', id=review['album_id']) }}">
+                            <img class="profile-reviews-cover" src="{{ url_for('static', filename='images/' + review['album_cover']) }}" alt="{{ review['album_cover'] }}">
+                        </a>
+                    </div>
+                    <div class="profile-reviews-right">
+                        <h3><a href="{{ url_for('album', id=review['album_id']) }}">{{ review['album_title'] }}</a></h3>
+                        <p>⭐ {{ review['rating'] }}/10</p>
+                        <p>{{ review['review_text'] }}</p>
+                        <p><em>{{ review['review_date'] }}</em></p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>You haven't reviewed any albums yet.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

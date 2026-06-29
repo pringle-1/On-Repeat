@@ -188,13 +188,15 @@ def artist(id):
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template("profile.html", active_page="profile")
+    sql = """SELECT Review.*, Album.album_title, Album.album_cover FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE Review.user_id = ? ORDER BY Review.review_date DESC"""
+    reviews = query_db(sql, (session['user_id'],))
+    return render_template("profile.html", active_page="profile", reviews=reviews)
 
 # Route for other user profiles
 @app.route('/user/<int:id>')
 def user(id):
     sql = """SELECT * FROM User WHERE user_id = ?;"""
-    reviewsql = """SELECT Review.*, Album.album_title FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE Review.user_id = ? ORDER BY Review.review_date DESC;"""
+    reviewsql = """SELECT Review.*, Album.album_title, Album.album_cover FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE Review.user_id = ? ORDER BY Review.review_date DESC;"""
     user = query_db(sql, (id,), True)
     reviews = query_db(reviewsql, (id,))
     if user is None:

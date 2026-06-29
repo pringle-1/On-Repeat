@@ -266,11 +266,27 @@ img {
     margin: 2rem 0;
 }
 .profile-reviews {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
     border: 3px solid black;
     border-radius: 20px;
     padding: 1rem;
     margin-bottom: 1.5rem;
     text-align: left;
+}
+.profile-reviews-cover {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 3px solid black;
+    border-radius: 10px;
+}
+.profile-reviews-right {
+    flex: 1;
+}
+.profile-reviews-right h3 {
+    margin-top: 0;
 }
 
 /* Content Styling (albums page and artists page) */
