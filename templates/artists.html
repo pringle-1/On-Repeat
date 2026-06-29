@@ -15,7 +15,7 @@
             <!-- Artist name then artist image -->
             <div class="content-card">
                 <h1 class="content-header">{{ artist['artist_name'] }}</h1>
-                <img src="{{ url_for('static', filename='images/' + artist['artist_image'])}}" alt="{{ artist['artist_name'] }}">
+                <img src="{{ url_for('static', filename='images/' + artist['artist_image'])}}" alt="{{ artist['artist_name'] }}{% if artist['artist_name'].endswith('s') %}'{% else %}'s{% endif %} artist image">
             </div>
         </a>
     {% endfor %}

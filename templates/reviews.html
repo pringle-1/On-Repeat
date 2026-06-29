@@ -14,7 +14,7 @@
             <div class="reviews-card">
                 <div class="review-left">
                     <a href="{{ url_for('user', id=review['user_id']) }}">
-                        <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}">
+                        <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}{% if review['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
                     </a>
                 </div>
                 <div class="review-right">

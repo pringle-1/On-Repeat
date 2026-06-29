@@ -12,7 +12,7 @@
         <h1 class="album-header">{{ album['album_title'] }} <em>({{ album['release_year'] }})</em></h1>
         <div class="album-info">
             <div class="album-left">
-                <img class="album-cover" src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}">
+                <img class="album-cover" src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}{% if album['album_title'].endswith('s') %}'{% else %}'s{% endif %} album cover">
             </div>
             <div class="album-right">
                 <p>Artist: {{ album['artist_name'] }}</p>

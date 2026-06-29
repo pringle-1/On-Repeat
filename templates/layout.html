@@ -26,7 +26,7 @@
                     </li>
                     <li>
                         <a href="{{ url_for('profile') }}">
-                            <img class="profile-button" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}">
+                            <img class="profile-button" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}{% if current_user['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
                         </a>
                         </li>
                 {% else %}

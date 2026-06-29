@@ -10,7 +10,7 @@
         <h1 class="username">My Profile</h1>
         <div class="profile-info">
             <div class="profile-left">
-                <img class="profile-picture" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}">
+                <img class="profile-picture" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}{% if current_user['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
             </div>
             <div class="profile-right">
                 <h2 class="join-date">Date Joined: {{ current_user['date_joined'] }}</h2>
@@ -18,13 +18,13 @@
             </div>
         </div>
         <div class="profile-divider"></div>
-        <h1 class="profile-reviews-header">Reviews {{ reviews|length }}</h1>
+        <h1 class="profile-reviews-header">Reviews ({{ reviews|length }})</h1>
         {% if reviews %}
             {% for review in reviews %}
                 <div class="profile-reviews">
                     <div class="profile-reviews-left">
                         <a href="{{ url_for('album', id=review['album_id']) }}">
-                            <img class="profile-reviews-cover" src="{{ url_for('static', filename='images/' + review['album_cover']) }}" alt="{{ review['album_cover'] }}">
+                            <img class="profile-reviews-cover" src="{{ url_for('static', filename='images/' + review['album_cover']) }}" alt="{{ review['album_title'] }}{% if review['album_title'].endswith('s') %}'{% else %}'s{% endif %} album cover">
                         </a>
                     </div>
                     <div class="profile-reviews-right">
