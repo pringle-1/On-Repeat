@@ -13,10 +13,10 @@
                 <img class="album-cover" src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}{% if album['album_title'].endswith('s') %}'{% else %}'s{% endif %} album cover">
             </div>
             <div class="album-right">
-                <p>Artist: <b><em>{{ album['artist_name'] }}</em></b></p>
-                <p>Release Year: <b><em>{{ album['release_year'] }}</em></b></p>
-                <p>Average Rating: <b><em>{{ album['average_rating'] }}/10</em></b></p>
-                <p class="album-about">About Album: <b><em>{{ album['album_description'] }}</em></b></p>
+                <p><b>Artist:</b> <em>{{ album['artist_name'] }}</em></p>
+                <p><b>Release Year:</b> <em>{{ album['release_year'] }}</em></p>
+                <p><b>Average Rating:</b> <em>{{ album['average_rating'] }}/10</em></p>
+                <p class="album-about"><b>About Album:</b> <em>{{ album['album_description'] }}</em></p>
                 <div class="review-buttons-container">
                     {% if current_user %}
                         <a class="review-buttons" href="{{ url_for('review', id=album['album_id']) }}">

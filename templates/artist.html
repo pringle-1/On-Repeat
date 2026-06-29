@@ -9,8 +9,8 @@
     <h1 class="page-header">{{ artist['artist_name'] }}</h1>
 </div>
 <div class="artist-info">
-    <p> Founding Year: {{ artist['formation_year'] }}</p>
-    <p> About Artist: {{ artist['artist_bio'] }}</p>
+    <p><b>Founding Year:</b> {{ artist['formation_year'] }}</p>
+    <p><b>About Artist:</b> {{ artist['artist_bio'] }}</p>
 </div>
 <div class="content-container">
     <h2 class="discography">{{ artist['artist_name'] }}{% if artist['artist_name'].endswith('s') %}'{% else %}'s{% endif %} Discography</h2>

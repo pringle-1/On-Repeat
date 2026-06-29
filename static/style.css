@@ -110,7 +110,7 @@ footer {
     align-items: center;
     border: 5px solid black;
     border-radius: 50px;
-    max-width: 68.3rem;
+    max-width: 68rem;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2em;
@@ -298,7 +298,8 @@ img {
     color: white;
     background-color: var(--lighter-purple);
     width: min(68rem, 90vw);
-    height: 4.5rem;
+    box-sizing: border-box;
+    height: 5rem;
     font-size: 3.4rem;
     border: 5px solid black;
     border-radius: 20px;
@@ -311,7 +312,8 @@ img {
     align-items: center;
     border: 5px solid black;
     border-radius: 50px;
-    max-width: 68.3rem;
+    width: min(68rem, 90vw);
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2em;
@@ -378,16 +380,18 @@ img {
     border-radius: 35px;
 }
 .artist-info {
-    max-width: 68.3rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 1.8rem auto;
+    width: min(68rem, 90vw);
+    margin: 0 auto 1.8rem;
+    padding: 1rem 2rem;
+    box-sizing: border-box;
+    text-align: left;
     border: 5px solid black;
     border-radius: 35px;
 }
 .discography {
-    grid-column: 1 / span 3;
+    grid-column: 1 / -1;
+    width: 100%;
+    box-sizing: border-box;
     color: white;
     font-size: 4.27rem;
     text-decoration: underline;
