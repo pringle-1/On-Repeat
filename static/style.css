@@ -24,10 +24,10 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1vh 2vw;
+    padding: 0.3rem 1.7rem;
 }
 .logo {
-    max-width: 15vw;
+    max-width: 12.8rem;
 }
 .home {
     width: 35px;
@@ -41,7 +41,7 @@ header {
     list-style: none;
     display: flex;
     align-items: center;
-    gap: 3vw;
+    gap: 2.5rem;
 
     margin: 0;
     padding: 0;
@@ -76,32 +76,32 @@ header {
 footer {
     position: absolute;
     width: 100%;
-    font-size: 2vw;
+    font-size: 1.7rem;
     background-color: var(--darker-blue);
     color: white;
     text-align: center;
-    min-height: 30vh;
+    min-height: 11.2rem;
 }
 .copyright {
     display: flex;
-    margin-left: 10vw;
-    margin-top: 12vh;
+    margin-left: 8.5rem;
+    margin-top: 4.5rem;
 }
 
 /* Index Styling (home page) */
 .welcome {
-    margin-left: 10vw;
+    margin-left: 8.5rem;
     text-decoration: underline;
 }
 .index-header {
     grid-column: 1 / span 3;
     justify-self: center;
     text-align: center;
-    height: 1vh;
-    width: 31vw;
+    height: 0.3rem;
+    width: 26.5rem;
     color: white;
-    font-size: 4vw;
-    margin-top: 1vh;
+    font-size: 3.4rem;
+    margin-top: 0.3rem;
 }
 .index-container {
     background-color: var(--primary-purple);
@@ -110,29 +110,29 @@ footer {
     align-items: center;
     border: 5px solid black;
     border-radius: 50px;
-    max-width: 80vw;
+    max-width: 68.3rem;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2em;
-    margin: 0 auto 10vh auto;
+    margin: 0 auto 3.7rem auto;
     padding: 20px;
 }
 .index-card-container {
     background-color: var(--darker-blue);
     border-radius: 35px;
     border: 5px solid black;
-    min-height: 50vh;
+    min-height: 18.7rem;
 }
 .index-card-container img {
-    margin-bottom: 4vh;
-    max-width: 15vw;
+    margin-bottom: 1.5rem;
+    max-width: 12.8rem;
     border-radius: 35px;
     overflow: hidden;
 }
 
 /* Global Styling */
 img {
-    width: 100%;
+    max-width: 100%;
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
@@ -146,56 +146,56 @@ img {
 }
 .auth-card {
     text-align: center;
-    padding: 8vh 3vw;
+    padding: 3rem 2.5rem;
     color: white;
     border: 8px solid black;
     border-radius: 10px;
     background-color: var(--lighter-purple);
 }
 .auth-title {
-    font-size: 5vw;
+    font-size: 4.27rem;
     font-weight: bold;
     margin-top: 0;
-    margin-bottom: 1vh;
+    margin-bottom: 0.3rem;
 }
 .input-wrapper {
     position: relative;
     width: 100%;
-    margin-bottom: 1vh;
+    margin-bottom: 0.3rem;
 }
 .auth-input {
     margin: 0;
-    padding-left: 0.5vw;
+    padding-left: 0.42rem;
     color: white;
     background: transparent;
     font-family: 'Be Vietnam Pro', sans-serif;
-    min-height: 5vh;
+    min-height: 1.8rem;
     width: 100%;
     border: 3px solid var(--border-purple);
     border-radius: 50px;
 }
 .auth-input::placeholder {
     color: white;
-    font-size: 1vw;
+    font-size: 0.85rem;
 }
 .auth-input:focus {
     outline: none;
 }
 .input-icon {
     position: absolute;
-    max-width: 2vw;
+    max-width: 1.7rem;
     transform: translateY(-50%);
-    right: 0.5vw;
+    right: 0.42rem;
     top: 50%;
 }
 .auth-button {
     font-family: 'Be Vietnam Pro', sans-serif;
     width: 100%;
     border: none;
-    font-size: 2vw;
-    min-height: 5vh;
-    padding: 1.5vh;
-    margin-top: 1vh;
+    font-size: 1.7rem;
+    min-height: 1.8rem;
+    padding: 0.6rem;
+    margin-top: 0.3rem;
     color: var(--dark-gray);
     background-color: white;
     border-radius: 50px;
@@ -217,15 +217,15 @@ img {
     text-align: center;
 }
 .error-title {
-    font-size: 7vw;
+    font-size: 6rem;
 }
 .error-message {
-    font-size: 5vw;
+    font-size: 4.27rem;
 }
 .error-button {
-    font-size: 4vw;
-    margin-bottom: 2vh;
-    padding: 1vh 2vw;
+    font-size: 3.4rem;
+    margin-bottom: 0.6rem;
+    padding: 0.3rem 1.7rem;
     background-color: var(--primary-blue);
     color: white;
     border-radius: 50px;
@@ -236,12 +236,11 @@ img {
 .profile-container {
     display: flex;
     justify-content: center;
-    min-height: 100vh;
 }
 .profile-card {
-    margin: 5vh 0;
-    padding: 10vh 3vw;
-    width: 50vw;
+    margin: 1.8rem 0;
+    padding: 3.7rem 2.5rem;
+    width: 42.7rem;
     text-align: center;
     border: 5px solid black;
     border-radius: 35px;
@@ -249,12 +248,12 @@ img {
 .profile-picture {
     width: 300px;
     height: 300px;
-    border-radius: 2vw;
+    border-radius: 1.7rem;
     object-fit: cover;
 }
 .profile-info {
     display: flex;
-    gap: 3vw;
+    gap: 2.5rem;
     align-items: flex-start;
     text-align: left;
 }
@@ -298,12 +297,12 @@ img {
     text-align: center;
     color: white;
     background-color: var(--lighter-purple);
-    width: 80vw;
-    height: 12vh;
-    font-size: 4vw;
+    width: min(68rem, 90vw);
+    height: 4.5rem;
+    font-size: 3.4rem;
     border: 5px solid black;
     border-radius: 20px;
-    margin-top: 1vh;
+    margin-top: 0.3rem;
 }
 .content-container {
     background-color: var(--primary-purple);
@@ -312,22 +311,22 @@ img {
     align-items: center;
     border: 5px solid black;
     border-radius: 50px;
-    max-width: 80vw;
+    max-width: 68.3rem;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2em;
     margin: 0 auto;
-    margin-bottom: 10vh;
+    margin-bottom: 3.7rem;
 }
 .content-card img {
-    margin-bottom: 4vh;
-    max-width: 15vw;
+    margin-bottom: 1.5rem;
+    max-width: 12.8rem;
     border-radius: 35px;
     overflow: hidden;
     border: 5px solid black;
 }
 .content-header {
-    font-size: 1.7vw;
+    font-size: 1.45rem;
     color: white;
 }
 
@@ -335,11 +334,11 @@ img {
 .album-container {
     display: flex;
     justify-content: center;
-    min-height: 90vh;
+    min-height: 33.7rem;
 }
 .album-card {
-    margin: 5vh 0;
-    width: 60vw;
+    margin: 1.8rem 0;
+    width: 51.2rem;
     text-align: center;
     border: 5px solid black;
     border-radius: 35px;
@@ -350,47 +349,47 @@ img {
 .album-cover {
     width: 300px;
     height: 300px;
-    margin-left: 4vw;
-    border-radius: 2vw;
+    margin-left: 3.4rem;
+    border-radius: 1.7rem;
     object-fit: cover;
     border: 3px solid black;
 }
 .album-info {
     display: flex;
-    gap: 3vw;
+    gap: 2.5rem;
     align-items: flex-start;
     text-align: left;
 }
 .album-about {
-    width: 29vw;
+    width: 24.8rem;
 }
 .review-buttons-container {
     display: flex;
     align-items: flex-start;
     text-align: center;
-    gap: 1vw;
+    gap: 0.85rem;
 }
 .review-buttons {
     color: black;
     text-decoration: none;
-    padding: 0.7vw;
-    font-size: 1.7vw;
+    padding: 0.6rem;
+    font-size: 1.45rem;
     border: 3px solid black;
     border-radius: 35px;
 }
 .artist-info {
-    max-width: 80vw;
+    max-width: 68.3rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 5vh auto;
+    margin: 1.8rem auto;
     border: 5px solid black;
     border-radius: 35px;
 }
 .discography {
     grid-column: 1 / span 3;
     color: white;
-    font-size: 5vw;
+    font-size: 4.27rem;
     text-decoration: underline;
 }
 
@@ -399,19 +398,19 @@ img {
     display: flex;
     justify-content: center;
 }
-/* Reviews Stlying (Read reviews for an individual album page) */
+/* Reviews Styling (Read reviews for an individual album page) */
 .reviews-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 90vh;
+    min-height: 33.7rem;
     gap: 2rem;
-    margin-bottom: 5vh;
+    margin-bottom: 1.8rem;
 }
 .reviews-card {
     display: flex;
     gap: 2rem;
-    width: 75vw;
+    width: 64rem;
     padding: 2rem;
     border: 5px solid black;
     border-radius: 35px;
