@@ -13,10 +13,14 @@
         {% for review in reviews %}
             <div class="reviews-card">
                 <div class="review-left">
-                    <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}">
+                    <a href="{{ url_for('user', id=review['user_id']) }}">
+                        <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}">
+                    </a>
                 </div>
                 <div class="review-right">
-                    <h2>{{ review['username'] }}</h2>
+                    <a href="{{ url_for('user', id=review['user_id']) }}">
+                        <h2>{{ review['username'] }}</h2>
+                    </a>
                     <p>Date posted: {{ review['review_date']}}</p>
                     <p>⭐: {{ review['rating'] }}/10</p>
                     <p>What they thought: {{ review['review_text'] }}</p>

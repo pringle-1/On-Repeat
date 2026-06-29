@@ -125,7 +125,7 @@ def albums():
 def album(id):
     # Only one album from its ID
     sql = """SELECT * FROM album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
-    album = query_db(sql,(id,),True)
+    album = query_db(sql,(id,), True)
     if album is None:
         abort(404)
     return render_template("album.html", album=album)
@@ -134,7 +134,7 @@ def album(id):
 @app.route('/album/<int:id>/review', methods=['GET', 'POST'])
 def review(id):
     sql = """SELECT * FROM Album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
-    album = query_db(sql,(id,),True)
+    album = query_db(sql,(id,), True)
     if album is None:
         abort(404)
     if 'user_id' not in session:
@@ -177,7 +177,7 @@ def artists():
 def artist(id):
     # Only one artist from its ID
     sql = """SELECT * FROM artist WHERE artist_id = ?;"""
-    artist = query_db(sql,(id,),True)
+    artist = query_db(sql,(id,), True)
     if artist is None:
         abort(404)
     albums = query_db("SELECT * FROM Album WHERE artist_id = ?", (id,))
@@ -189,6 +189,15 @@ def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     return render_template("profile.html", active_page="profile")
+
+# Route for other user profiles
+@app.route('/user/<int:id>')
+def user(id):
+    sql = """SELECT * FROM User WHERE user_id = ?;"""
+    user = query_db(sql, (id,), True)
+    if user is None:
+        abort(404)
+    return render_template("user.html", user=user)
 
 # Run statement
 if __name__ == "__main__":

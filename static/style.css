@@ -386,7 +386,6 @@ img {
     gap: 2rem;
     width: 75vw;
     padding: 2rem;
-    text-align: center;
     border: 5px solid black;
     border-radius: 35px;
 }
@@ -394,7 +393,6 @@ img {
     width: 100px;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
 }
 .review-profile-picture {
     width: 80px;
@@ -406,4 +404,7 @@ img {
 .review-right {
     flex: 1;
     text-align: left;
+}
+.review-right h2 {
+    margin-top: 0;
 }
