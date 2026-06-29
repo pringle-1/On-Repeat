@@ -232,7 +232,7 @@ img {
     text-decoration: none;
 }
 
-/* Account Information Styling (my profile page) */
+/* Account Information Styling (My Profile and User page) */
 .profile-container {
     display: flex;
     justify-content: center;
@@ -260,6 +260,17 @@ img {
 }
 .username {
     text-decoration: underline;
+}
+.profile-divider {
+    border-top: 3px solid black;
+    margin: 2rem 0;
+}
+.profile-reviews {
+    border: 3px solid black;
+    border-radius: 20px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
 }
 
 /* Content Styling (albums page and artists page) */

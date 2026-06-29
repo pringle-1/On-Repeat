@@ -194,10 +194,12 @@ def profile():
 @app.route('/user/<int:id>')
 def user(id):
     sql = """SELECT * FROM User WHERE user_id = ?;"""
+    reviewsql = """SELECT Review.*, Album.album_title FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE Review.user_id = ? ORDER BY Review.review_date DESC;"""
     user = query_db(sql, (id,), True)
+    reviews = query_db(reviewsql, (id,))
     if user is None:
         abort(404)
-    return render_template("user.html", user=user)
+    return render_template("user.html", user=user, reviews=reviews)
 
 # Run statement
 if __name__ == "__main__":

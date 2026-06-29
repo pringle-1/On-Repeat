@@ -1,0 +1,36 @@
+<!-- Extend the layout.html file onto the User page -->
+{% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title %}On Repeat - {{ user['username'] }}{% endblock %}
+<!-- User page main content block -->
+{% block content %}
+<!-- Card for user information -->
+<div class="profile-container">
+    <div class="profile-card">
+        <h1 class="username">{{ user['username'] }}{% if user['username'].endswith('s') %}'{% else %}'s{% endif %} Profile</h1>
+        <div class="profile-info">
+            <div class="profile-left">
+                <img class="profile-picture" src="{{ url_for('static', filename='images/' + user['profile_picture'])}}" alt="{{ user['username'] }}">
+            </div>
+            <div class="profile-right">
+                <h2 class="join-date">Date Joined: {{ user['date_joined'] }}</h2>
+                <h3 class="bio">About Me: <em>{{ user['user_bio'] }}</em></h3>
+            </div>
+        </div>
+        <div class="profile-divider"></div>
+        <h1 class="profile-reviews-header">Reviews</h1>
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="profile-reviews">
+                    <h3><a href="{{ url_for('album', id=review['album_id']) }}">{{ review['album_title'] }}</a></h3>
+                    <p>⭐ {{ review['rating'] }}/10</p>
+                    <p>{{ review['review_text'] }}</p>
+                    <p><em>{{ review['review_date'] }}</em></p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>This user hasn't reviewd any albums yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
