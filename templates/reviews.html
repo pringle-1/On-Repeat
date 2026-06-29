@@ -4,14 +4,26 @@
 {% block title %}On Repeat - {{ album['album_title'] }} Reviews{% endblock %}
 <!-- Read Reviews page main content block -->
 {% block content %}
-<h1>Reviews for <em>{{ album['album_title'] }}</em></h1>
+<!-- Review Cards -->
+<div class="page-header-container">
+    <h1 class="page-header">Reviews for <em>{{ album['album_title'] }}</em></h1>
+</div>
 {% if reviews %}
-    {% for review in reviews %}
-        <h2>Reviewer: {{ review['username'] }}</h2>
-        <p>Rating: {{ review['rating'] }}/10</p>
-        <p>What they thought: {{ review['review_text'] }}</p>
-        <p>Date posted: {{ review['review_date']}}</p>
-    {% endfor %}
+    <div class="reviews-container">
+        {% for review in reviews %}
+            <div class="reviews-card">
+                <div class="review-left">
+                    <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}">
+                </div>
+                <div class="review-right">
+                    <h2>{{ review['username'] }}</h2>
+                    <p>Date posted: {{ review['review_date']}}</p>
+                    <p>⭐: {{ review['rating'] }}/10</p>
+                    <p>What they thought: {{ review['review_text'] }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% else %}
     <p>There are no reviews for this album yet!</p>
 {% endif %}

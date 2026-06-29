@@ -16,8 +16,8 @@
         <!-- Logo that leads to the home page (index) when clicked. It will appear on every page -->
         <nav class="navbar">
             <!-- Navbar of clickable links to other pages -->
-            <div class="navlinks">
-                <li><a href="{{ url_for('home') }}"><img class="home" src="{{ url_for('static', filename='images/home.png')}}" alt="Home Button"></a> 
+            <ul class="navlinks">
+                <li><a href="{{ url_for('home') }}"><img class="home" src="{{ url_for('static', filename='images/home.png')}}" alt="Home Button"></a></li>
                 <li><a href="{{ url_for('albums')}}" class="{% if active_page=='albums' %}active{% endif %}">Albums</a></li>
                 <li><a href="{{ url_for('artists')}}" class="{% if active_page=='artists' %}active{% endif %}">Artists</a></li>
                 {% if 'user_id' in session %}
@@ -26,18 +26,14 @@
                     </li>
                     <li>
                         <a href="{{ url_for('profile') }}">
-                            {% if current_user['profile_picture'] %}
-                                <img class="profile-button" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}">
-                            {% else %}
-                                <img class="profile-button" src="{{ url_for('static', filename='images/profile_placeholder.png') }}" alt="No profile picture">
-                            {% endif %}
+                            <img class="profile-button" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}">
                         </a>
                         </li>
                 {% else %}
                     <li><a href="{{ url_for('login') }}" class="{% if active_page=='profile' %}active{% endif %}">Login</a></li>
                     <li><a href="{{ url_for('register') }}">Register</a></li>
                 {% endif %}
-            </div>
+            </ul>
         </nav>
     </header>
     <main>

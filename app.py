@@ -140,8 +140,10 @@ def review(id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
     if request.method == 'POST':
-        rating = request.form['rating']
+        rating = float(request.form['rating'])
         review_text = request.form['review_text']
+        if rating < 0.1 or rating > 10:
+            return render_template("review.html", album=album, error="Rating must be between 0.1 and 10.0!")
         db = get_db()
         try:
             db.execute('INSERT INTO Review (user_id, album_id, rating, review_text, review_date) VALUES (?, ?, ?, ?, ?)', (session['user_id'], id, rating, review_text, date.today().strftime('%d/%m/%Y')))
@@ -154,7 +156,7 @@ def review(id):
 # Route to read the reviews for one album
 @app.route('/album/<int:id>/reviews')
 def reviews(id):
-    sql = """SELECT Review.*, User.username FROM Review JOIN User ON Review.user_id = User.user_id WHERE album_id = ?;"""
+    sql = """SELECT Review.*, User.username, User.profile_picture FROM Review JOIN User ON Review.user_id = User.user_id WHERE album_id = ? ORDER BY review_id DESC;"""
     albumsql = """SELECT * FROM Album WHERE album_id = ?"""
     album = query_db(albumsql,(id,), True)
     reviews = query_db(sql,(id,))

@@ -21,8 +21,8 @@
                     <p class="error">{{ error }}</p>
                 {% endif %}
                 <form method="POST" autocomplete="off">
-                    <label for="rating">Rating (1.0-10.0)</label><br>
-                    <input type="number" id="rating" name="rating" min="0.0" max="10.0" step="0.1" placeholder="Rate!" required><br>
+                    <label for="rating">Rating (0.1-10.0)</label><br>
+                    <input type="number" id="rating" name="rating" min="0.1" max="10.0" step="0.1" placeholder="Rate!" required><br>
                     <label for="review_text">Review</label><br>
                     <textarea id="review_text" name="review_text" rows="8" cols="50" placeholder="Let others know your thoughts on this album!" required></textarea>
                     <button type="submit">Post Review</button>

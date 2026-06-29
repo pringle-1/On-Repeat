@@ -29,16 +29,25 @@ header {
 .logo {
     max-width: 15vw;
 }
+.home {
+    width: 35px;
+    height: 35px;
+    object-fit: contain;
+}
 .navbar .navlinks a.logout {
     color: red;
 }
 .navbar .navlinks {
     list-style: none;
     display: flex;
+    align-items: center;
     gap: 3vw;
+
+    margin: 0;
+    padding: 0;
 }
 .navbar a:hover {
-    border-bottom: 5px solid white;
+    box-shadow: inset 0 -5px 0 white;
 }
 .navbar a.active {
     background-color: var(--darker-blue);
@@ -49,12 +58,18 @@ header {
 .navbar .navlinks a {
     color: white;
     text-decoration: none;
-    font-size: 30px;
+    font-size: 25px;
+    padding-bottom: 8px;
+}
+.navbar .navlinks li {
+    display: flex;
+    align-items: center;
 }
 .profile-button {
+    display: block;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     border: 5px solid var(--darker-blue);
     object-fit: cover;
 }
@@ -356,4 +371,39 @@ img {
 .review-container {
     display: flex;
     justify-content: center;
+}
+/* Reviews Stlying (Read reviews for an individual album page) */
+.reviews-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 90vh;
+    gap: 2rem;
+    margin-bottom: 5vh;
+}
+.reviews-card {
+    display: flex;
+    gap: 2rem;
+    width: 75vw;
+    padding: 2rem;
+    text-align: center;
+    border: 5px solid black;
+    border-radius: 35px;
+}
+.review-left {
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+.review-profile-picture {
+    width: 80px;
+    height: 80px;
+    border: 3px solid black;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.review-right {
+    flex: 1;
+    text-align: left;
 }
