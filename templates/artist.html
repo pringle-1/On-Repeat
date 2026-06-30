@@ -9,8 +9,11 @@
     <h1 class="page-header">{{ artist['artist_name'] }}</h1>
 </div>
 <div class="artist-info">
-    <p><b>Founding Year:</b> {{ artist['formation_year'] }}</p>
-    <p><b>About Artist:</b> {{ artist['artist_bio'] }}</p>
+    <img class="artist-image" src="{{ url_for('static', filename='images/' + artist['artist_image']) }}" alt="{{ artist['artist_name']}}{% if artist['artist_name'].endswith('s') %}'{% else %}'s{% endif %} artist image">
+    <div class="artist-details">
+        <p><b>Founding Year:</b> {{ artist['formation_year'] }}</p>
+        <p><b>About Artist:</b> {{ artist['artist_bio'] }}</p>
+    </div>
 </div>
 <div class="content-container">
     <h2 class="discography">{{ artist['artist_name'] }}{% if artist['artist_name'].endswith('s') %}'{% else %}'s{% endif %} Discography</h2>

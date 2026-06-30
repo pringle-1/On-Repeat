@@ -352,9 +352,9 @@ img {
     width: 300px;
     height: 300px;
     margin-left: 3.4rem;
-    border-radius: 1.7rem;
     object-fit: cover;
     border: 3px solid black;
+    border-radius: 1.7rem;
 }
 .album-info {
     display: flex;
@@ -379,14 +379,27 @@ img {
     border: 3px solid black;
     border-radius: 35px;
 }
+.artist-image {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    border: 3px solid black;
+    border-radius: 1.7rem;
+}
 .artist-info {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
     width: min(68rem, 90vw);
-    margin: 0 auto 1.8rem;
-    padding: 1rem 2rem;
+    margin: 1.8rem auto;
+    padding: 2rem;
     box-sizing: border-box;
-    text-align: left;
     border: 5px solid black;
     border-radius: 35px;
+}
+.artist-details {
+    flex: 1;
+    text-align: left;
 }
 .discography {
     grid-column: 1 / -1;
