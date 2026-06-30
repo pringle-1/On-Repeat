@@ -125,10 +125,15 @@ def albums():
 def album(id):
     # Only one album from its ID
     sql = """SELECT * FROM album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
+    averagerating = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?;"""
     album = query_db(sql,(id,), True)
+    average = query_db(averagerating, (id,), one=True)
+    average_rating = average['average_rating']
     if album is None:
         abort(404)
-    return render_template("album.html", album=album)
+    if average_rating is not None:
+        average_rating = round(average_rating, 1)
+    return render_template("album.html", album=album, average_rating=average_rating)
 
 # Route to write an album review
 @app.route('/album/<int:id>/review', methods=['GET', 'POST'])
@@ -157,7 +162,7 @@ def review(id):
 @app.route('/album/<int:id>/reviews')
 def reviews(id):
     sql = """SELECT Review.*, User.username, User.profile_picture FROM Review JOIN User ON Review.user_id = User.user_id WHERE album_id = ? ORDER BY review_id DESC;"""
-    albumsql = """SELECT * FROM Album WHERE album_id = ?"""
+    albumsql = """SELECT * FROM Album WHERE album_id = ?;"""
     album = query_db(albumsql,(id,), True)
     reviews = query_db(sql,(id,))
     if album is None:

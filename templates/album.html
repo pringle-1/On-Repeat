@@ -15,7 +15,14 @@
             <div class="album-right">
                 <p><b>Artist:</b> <em>{{ album['artist_name'] }}</em></p>
                 <p><b>Release Year:</b> <em>{{ album['release_year'] }}</em></p>
-                <p><b>Average Rating:</b> <em>{{ album['average_rating'] }}/10</em></p>
+                <p>
+                    <b>Average Rating:</b>
+                    {% if average_rating is not none %}
+                        <em>{{ average_rating }}/10</em>
+                    {% else %}
+                        <em>No ratings yet!</em>
+                    {% endif %}
+                </p>
                 <p class="album-about"><b>About Album:</b> <em>{{ album['album_description'] }}</em></p>
                 <div class="review-buttons-container">
                     {% if current_user %}
