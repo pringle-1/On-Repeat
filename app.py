@@ -57,8 +57,6 @@ def register():
             return render_template("register.html", error="Password must be at least 8 characters!")
         if password in BAD_PASSWORDS:
             return render_template("register.html", error="Weak password, choose a stronger one!")
-        if request.form['password'] != request.form['confirm_password']:
-            return render_template("register.html", error="Passwords do not match!")
         hashed_password = generate_password_hash(password)
         db = get_db()
         try:

@@ -181,11 +181,24 @@ img {
 .auth-input:focus {
     outline: none;
 }
+.show-password {
+    display: none;
+    position: absolute;
+    right: 2.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    user-select: none;
+    color: white;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
 .input-icon {
     position: absolute;
     max-width: 1.7rem;
     transform: translateY(-50%);
-    right: 0.42rem;
+    right: 0.4rem;
     top: 50%;
 }
 .auth-button {

@@ -1,17 +1,19 @@
+let currentPassword = null;
+
 function showPassword(id) {
-    document.getElementById(id).type = "text";
-}
+    currentPassword = document.getElementById(id);
 
-function hidePassword(id) {
-    document.getElementById(id).type = "password";
-}
-
-function togglePassword(id) {
-    const password = document.getElementById(id);
-
-    if (password.type === "password") {
-        password.type = "text";
-    } else {
-        password.type = "password";
+    if (currentPassword) {
+        currentPassword.type = "text";
     }
 }
+
+function hidePassword() {
+    if (currentPassword) {
+        currentPassword.type = "password";
+        currentPassword = null;
+    }
+}
+
+document.addEventListener("mouseup", hidePassword);
+document.addEventListener("touchend", hidePassword);
