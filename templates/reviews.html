@@ -6,7 +6,7 @@
 {% block content %}
 <!-- Review Cards -->
 <div class="page-header-container">
-    <h1 class="page-header">Reviews for <em>{{ album['album_title'] }}</em></h1>
+    <h1 class="page-header">Reviews for <em>{{ album['album_title'] }}</em> ({{ reviews|length }})</h1>
 </div>
 {% if reviews %}
     <div class="reviews-container">

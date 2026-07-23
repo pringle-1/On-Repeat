@@ -43,41 +43,41 @@ def query_db(query, args=(), one=False):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username'].lower()
+        username = request.form['username']
         password = request.form['password']
         if len(username) < 3:
-            return render_template("register.html", error="Username must be at least 3 characters!")
+            return render_template("register.html", error="Username must be at least 3 characters!", username=username)
         if len(username) > 20:
-            return render_template("register.html", error="Username must be 20 characters or less!")
+            return render_template("register.html", error="Username must be 20 characters or less!", username=username)
         if ' ' in username:
             return render_template("register.html", error="Username cannot contain spaces!")
-        if any(word in username.lower() for word in BANNED_WORDS):
+        if any(word in username.casefold() for word in BANNED_WORDS):
             return render_template("register.html", error="That username is not allowed!")
         if len(password) < 8:
-            return render_template("register.html", error="Password must be at least 8 characters!")
+            return render_template("register.html", error="Password must be at least 8 characters!", username=username)
         if password in BAD_PASSWORDS:
-            return render_template("register.html", error="Weak password, choose a stronger one!")
+            return render_template("register.html", error="Weak password, choose a stronger one!", username=username)
         hashed_password = generate_password_hash(password)
         db = get_db()
-        try:
-            db.execute('INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)', (username, hashed_password, date.today().strftime('%d/%m/%Y')))
-            db.commit()
-            return redirect(url_for('login'))
-        except:
-            return render_template("register.html", error="Username already taken!")
+        existing = query_db("SELECT * FROM User WHERE LOWER(username) = LOWER(?)", (username,), one=True)
+        if existing:
+            return render_template("register.html", error="Username already taken!", username=username)
+        db.execute('INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)', (username, hashed_password, date.today().strftime('%d/%m/%Y')))
+        db.commit()
+        return redirect(url_for('login'))
     return render_template("register.html")
 
 # Route for login (page)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username'].lower()
+        username = request.form['username']
         password = request.form['password']
-        user = query_db('SELECT * FROM user WHERE username = ?', (username,), one=True)
+        user = query_db('SELECT * FROM user WHERE LOWER(username) = LOWER(?)', (username,), one=True)
         if user is None:
-            return render_template("login.html", error="User not found!")
+            return render_template("login.html", error="User not found!", username=username)
         if not check_password_hash(user['password'], password):
-            return render_template("login.html", error="Incorrect password!")
+            return render_template("login.html", error="Incorrect password!", username=username)
         session['user_id'] = user['user_id']
         session['username'] = user['username']
         return redirect(url_for('home'))

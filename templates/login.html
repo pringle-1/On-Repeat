@@ -16,7 +16,7 @@
         {% endif %}
         <form method="POST" autocomplete="off">
             <div class="input-wrapper">
-                <input class="auth-input" type="text" name="username" placeholder="Username" required>
+                <input class="auth-input" type="text" name="username" placeholder="Username" value="{{ username or '' }}" required>
                 <img class="input-icon" src="{{ url_for('static', filename='images/user.png') }}" alt="user icon">
             </div>
             <div class="input-wrapper">
