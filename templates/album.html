@@ -1,4 +1,4 @@
-<!-- Extend the layout.html file onto the Albums page -->
+<!-- Extend the layout.html file onto the Album page -->
 {% extends "layout.html" %}
 <!-- Set the page title that displays on the tab -->
 {% block title %}On Repeat - {{ album['album_title'] }}{% endblock %}
@@ -34,7 +34,7 @@
                             Write a Review
                         </a><br>
                     {% else %}
-                        <a class="review-buttons" href="{{ url_for('login') }}">Login to review</a>
+                        <a class="review-buttons" href="{{ url_for('login') }}">Login to Review</a>
                     {% endif %}
                     <a class="review-buttons" href="{{ url_for('reviews', id=album['album_id']) }}">
                         Read Reviews

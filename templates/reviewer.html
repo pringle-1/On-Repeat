@@ -1,0 +1,42 @@
+<!-- Extend the layout.html file onto the Review Creation page -->
+{% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title %}On Repeat - Review {{ album['album_title'] }}{% endblock %}
+<!-- Write A Review page main content block -->
+{% block content %}
+<div class="page-header-container">
+    <h1 class="page-header">Album Review</h1>
+</div>
+<div class="album-container">
+    <div class="album-card">
+        <h1 class="album-header">{{ album['album_title'] }} <em>({{ album['release_year'] }})</em></h1>
+        <div class="album-info">
+            <div class="album-left">
+                <img class="album-cover" src="{{ url_for('static', filename='images/' + album['album_cover'])}}" alt="{{ album['album_title'] }}{% if album['album_title'].endswith('s') %}'{% else %}'s{% endif %} album cover">
+            </div>
+            <div class="album-right">
+                <p>Artist: {{ album['artist_name'] }}</p>
+                <p>Release Year: {{ album['release_year'] }}</p>
+                <p>
+                    <b>Average Rating:</b>
+                    {% if average_rating is not none %}
+                        <em>{{ "%.1f"|format(average_rating) }}/10</em>
+                    {% else %}
+                        <em>No ratings yet!</em>
+                    {% endif %}
+                </p>
+                {% if error %}
+                    <p class="error">{{ error }}</p>
+                {% endif %}
+                <form method="POST" autocomplete="off">
+                    <label for="rating">Rating (0.1-10.0)</label><br>
+                    <input type="number" id="rating" name="rating" min="0.1" max="10.0" step="0.1" placeholder="Rate!" required><br>
+                    <label for="review_text">Review</label><br>
+                    <textarea id="review_text" name="review_text" rows="8" cols="50" placeholder="Let others know your thoughts on this album!" required></textarea>
+                    <button type="submit">Post Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
