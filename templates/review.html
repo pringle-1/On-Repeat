@@ -67,6 +67,8 @@
                 <p>{{ comment['comment_text'] }}</p>
             </div>
         {% endfor %}
+    {% else %}
+        <p><em>No comments yet. Be the first to comment!</em></p>
     {% endif %}
 </div>
 {% endblock %}

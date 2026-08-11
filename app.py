@@ -177,7 +177,9 @@ def reviews(id):
 def review_page(id):
     # Only one review from its ID
     sql = """SELECT Review.*, User.username, User.profile_picture, Album.album_title, Album.album_cover, Artist.artist_id, Artist.artist_name FROM review JOIN User ON Review.user_id = User.user_id JOIN Album ON Review.album_id = Album.album_id JOIN Artist ON Album.artist_id = Artist.artist_id WHERE review_id = ?;"""
+    commentsql = """SELECT Comment.*, User.username FROM Comment JOIN User ON Comment.user_id = User.user_id WHERE review_id = ? ORDER BY comment_id ASC;"""
     review = query_db(sql,(id,), True)
+    comments = query_db(commentsql, (id,))
     if review is None:
         abort(404)
     if request.method == 'POST':
@@ -188,7 +190,7 @@ def review_page(id):
         db.execute('INSERT INTO COMMENT (user_id, review_id, comment_text, comment_date) VALUES (?, ?, ?, ?)', (session['user_id'], id, comment_text, date.today().strftime('%d/%m/%Y')))
         db.commit()
         return redirect(url_for('review_page', id=id))
-    return render_template("review.html", review=review)
+    return render_template("review.html", review=review, comments=comments)
 
 # Route for artists page
 @app.route('/artists')
