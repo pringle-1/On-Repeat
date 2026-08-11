@@ -4,4 +4,69 @@
 {% block title %}On Repeat - Review{% endblock %}
 <!-- One review page main content block -->
 {% block content %}
+<div class="page-header-container">
+    <h1 class="page-header">Review by {{ review['username'] }}</h1>
+</div>
+<div class="reviews-container">
+    <div class="reviews-card">
+        <div class="review-left">
+            <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}{% if review['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
+        </div>
+        <div class="review-right">
+            <h2>
+                <a href="{{ url_for('user', id=review['user_id']) }}">{{ review['username'] }}</a>
+            </h2>
+            <p>
+                <b>Album:</b>
+                <a href="{{url_for('album', id=review['album_id'])  }}">
+                    <em>{{ review['album_title'] }}</em>
+                </a>                
+            </p>
+            <p>
+                <b>Artist:</b>
+                <a href="{{ url_for('artist', id=review['artist_id']) }}">
+                    <em>{{ review['artist_name'] }}</em>
+                </a>         
+            </p>
+            <p>
+                <b>Rating:</b>
+                <em><u>{{ review['rating'] }}</u>/10</em>
+            </p>
+            <p>
+                <b>Date:</b>
+                <em>{{ review['review_date'] }}</em>
+            </p>
+            <hr>
+            <p><b>What they thought:</b>{{ review['review_text'] }}</p>
+        </div>
+    </div>
+    <h2>Comments</h2>
+    {% if current_user %}
+        <form method="POST" autocomplete="off">
+            <textarea name="comment_text" placeholder="Write a comment..." required></textarea>
+            <button type="submit">Post Comment</button>
+        </form>
+    {% else %}
+        <p>
+            <em>
+                <a href="{{ url_for('login') }}">Log in</a>
+                to comment!
+            </em>
+        </p>
+    {% endif %}
+    <hr>
+    {% if comments %}
+        {% for comment in comments %}
+            <div class="comment-card">
+                <p>
+                    <b>
+                        <a href="{{ url_for('profile', id=comment['user_id']) }}">{{ comment['username'] }}</a>
+                    </b>
+                        {{ comment['comment_date'] }}
+                </p>
+                <p>{{ comment['comment_text'] }}</p>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
 {% endblock %}
