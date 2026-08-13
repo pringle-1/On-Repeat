@@ -177,7 +177,7 @@ def reviews(id):
 def review_page(id):
     # Only one review from its ID
     sql = """SELECT Review.*, User.username, User.profile_picture, Album.album_title, Album.album_cover, Artist.artist_id, Artist.artist_name FROM review JOIN User ON Review.user_id = User.user_id JOIN Album ON Review.album_id = Album.album_id JOIN Artist ON Album.artist_id = Artist.artist_id WHERE review_id = ?;"""
-    commentsql = """SELECT Comment.*, User.username FROM Comment JOIN User ON Comment.user_id = User.user_id WHERE review_id = ? ORDER BY comment_id ASC;"""
+    commentsql = """SELECT Comment.*, User.username, User.profile_picture FROM Comment JOIN User ON Comment.user_id = User.user_id WHERE review_id = ? ORDER BY comment_id DESC;"""
     review = query_db(sql,(id,), True)
     comments = query_db(commentsql, (id,))
     if review is None:

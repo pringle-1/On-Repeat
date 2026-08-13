@@ -464,3 +464,37 @@ img {
 .review-right h2 {
     margin-top: 0;
 }
+
+/* Comment Styling */
+.comment-card {
+    display: flex;
+    gap: 1.5rem;
+    width: 69rem;
+    box-sizing: border-box;
+    padding: 1.5rem;
+    border: 3px solid black;
+    border-radius: 20px;
+    text-align: left;
+}
+.comment-left {
+    width: 70px;
+    display: flex;
+    justify-content: center;
+}
+.comment-profile-picture {
+    width: 60px;
+    height: 60px;
+    border: 3px solid black;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.comment-right {
+    flex: 1;
+}
+.comment-header em {
+    margin-left: 0.8rem;
+    font-size: 1rem;
+}
+.comment-text {
+    margin-bottom: 0;
+}

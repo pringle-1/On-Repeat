@@ -30,7 +30,7 @@
             </p>
             <p>
                 <b>Rating:</b>
-                <em><u>{{ review['rating'] }}</u>/10</em>
+                <em><b>{{ review['rating'] }}</b>/10</em>
             </p>
             <p>
                 <b>Date:</b>
@@ -58,13 +58,20 @@
     {% if comments %}
         {% for comment in comments %}
             <div class="comment-card">
-                <p>
-                    <b>
-                        <a href="{{ url_for('profile', id=comment['user_id']) }}">{{ comment['username'] }}</a>
-                    </b>
-                        {{ comment['comment_date'] }}
-                </p>
-                <p>{{ comment['comment_text'] }}</p>
+                <div class="comment-left">
+                    <img class="comment-profile-picture" src="{{ url_for('static', filename='images/' + comment['profile_picture']) }}" alt="{{ comment['username'] }}{% if comment['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
+                </div>
+                <div class="comment-right">
+                    <p class="comment-header">
+                        <a href="{{ url_for('profile', id=comment['user_id']) }}">
+                            <b>{{ comment['username'] }}</b>
+                        </a>
+                        <em>{{ comment['comment_date'] }}</em>
+                    </p>
+                    <p class="comment-text">
+                        {{ comment['comment_text'] }}
+                    </p>    
+                </div>
             </div>
         {% endfor %}
     {% else %}
