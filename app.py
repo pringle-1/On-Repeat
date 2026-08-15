@@ -159,7 +159,7 @@ def review(id):
             return redirect(url_for('reviews', id=id))
         except sqlite3.IntegrityError:
             return render_template("reviewer.html", album=album, error="You have already reviewed this album!")
-    return render_template("reviewer.html", album=album, average_rating=average_rating)
+    return render_template("reviewer.html", album=album, average_rating=average_rating, review=review)
 
 # Route to read the reviews for one album
 @app.route('/album/<int:id>/reviews')
@@ -192,6 +192,35 @@ def review_page(id):
         return redirect(url_for('review_page', id=id))
     return render_template("review.html", review=review, comments=comments)
 
+
+# Route for editing a review
+@app.route('/review/<int:id>/edit', methods=['GET', 'POST'])
+def edit_review(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    reviewsql = """SELECT Review.*, Album.album_title, Album.album_cover, Album.release_year, Artist.artist_name FROM Review JOIN Album ON Review.album_id = Album.album_id JOIN Artist ON Album.artist_id = Artist.artist_id WHERE review_id = ?"""
+    review = query_db(reviewsql, (id,), True)
+    editsql = """UPDATE Review SET rating = ?, review_text = ? WHERE review_id = ?"""
+    if review is None:
+        abort(404)
+    if review['user_id'] != session['user_id']:
+        abort(403)
+    averagerating = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?"""
+    average = query_db(averagerating, (review['album_id'],), True)
+    average_rating = average['average_rating']
+    if average_rating is not None:
+        average_rating = round(average_rating, 1)
+    if request.method == 'POST':
+        rating = float(request.form['rating'])
+        review_text = request.form['review_text']
+        if rating < 0.1 or rating > 10.0:
+            return render_template("edit_review.html", review=review, average_rating=average_rating, error="Rating must be between 0.1 and 10.0!")
+        db = get_db()
+        db.execute(editsql, (rating, review_text, id))
+        db.commit()
+        return redirect(url_for('review_page', id=id))
+    return render_template("edit_review.html", review=review, average_rating=average_rating)
+
 # Route for deleting a review
 @app.route('/review/<int:id>/delete', methods=['POST'])
 def delete_review(id):
@@ -208,29 +237,6 @@ def delete_review(id):
     db.execute('DELETE FROM Review WHERE review_id = ?', (id,))
     db.commit()
     return redirect(url_for('reviews', id=review['album_id']))
-
-# Route for editing a review
-@app.route('/review/<int:id>/edit', methods=['GET', 'POST'])
-def edit_review(id):
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    reviewsql = """SELECT Review.*, Album.album_title, Album.album_cover FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE review_id = ?"""
-    review = query_db(reviewsql, (id,), True)
-    editsql = """UPDATE Review SET rating = ?, review_text = ? WHERE review_id = ?"""
-    if review is None:
-        abort(404)
-    if review['user_id'] != session['user_id']:
-        abort(403)
-    if request.method == 'POST':
-        rating = float(request.form['rating'])
-        review_text = request.form['review_text']
-        if rating < 0.1 or rating > 10.0:
-            return render_template("edit_review.html", error="Rating must be between 0.1 and 10.0!")
-        db = get_db()
-        db.execute(editsql, (rating, review_text, id))
-        db.commit()
-        return redirect(url_for('review_page, id=id'))
-    return render_template("edit_revew.html", review=review)
 
 # Route for artists page
 @app.route('/artists')
