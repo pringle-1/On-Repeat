@@ -192,6 +192,46 @@ def review_page(id):
         return redirect(url_for('review_page', id=id))
     return render_template("review.html", review=review, comments=comments)
 
+# Route for deleting a review
+@app.route('/review/<int:id>/delete', methods=['POST'])
+def delete_review(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    reviewsql = """SELECT * FROM Review WHERE review_id = ?"""
+    review = query_db(reviewsql, (id,),True)
+    if review is None:
+        abort(404)
+    if review['user_id'] != session['user_id']:
+        abort(403)
+    db = get_db()
+    db.execute('DELETE FROM Comment WHERE review_id = ?', (id,))
+    db.execute('DELETE FROM Review WHERE review_id = ?', (id,))
+    db.commit()
+    return redirect(url_for('reviews', id=review['album_id']))
+
+# Route for editing a review
+@app.route('/review/<int:id>/edit', methods=['GET', 'POST'])
+def edit_review(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    reviewsql = """SELECT Review.*, Album.album_title, Album.album_cover FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE review_id = ?"""
+    review = query_db(reviewsql, (id,), True)
+    editsql = """UPDATE Review SET rating = ?, review_text = ? WHERE review_id = ?"""
+    if review is None:
+        abort(404)
+    if review['user_id'] != session['user_id']:
+        abort(403)
+    if request.method == 'POST':
+        rating = float(request.form['rating'])
+        review_text = request.form['review_text']
+        if rating < 0.1 or rating > 10.0:
+            return render_template("edit_review.html", error="Rating must be between 0.1 and 10.0!")
+        db = get_db()
+        db.execute(editsql, (rating, review_text, id))
+        db.commit()
+        return redirect(url_for('review_page, id=id'))
+    return render_template("edit_revew.html", review=review)
+
 # Route for artists page
 @app.route('/artists')
 def artists():
