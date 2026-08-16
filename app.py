@@ -266,6 +266,17 @@ def profile():
     reviews = query_db(sql, (session['user_id'],))
     return render_template("profile.html", active_page="profile", reviews=reviews)
 
+# Route for editing my profile
+@app.route('/profile/edit', methods=['GET', 'POST'])
+def edit_profile():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    usersql = """SELECT * FROM User WHERE user_id = ?"""
+    user = query_db(usersql, (session['user_id'],), one=True)
+    if user is None:
+        abort(404)
+    return render_template("edit_profile.html", user=user)
+
 # Route for other user profiles
 @app.route('/user/<int:id>')
 def user(id):
