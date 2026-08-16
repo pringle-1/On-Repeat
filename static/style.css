@@ -221,7 +221,7 @@ img {
     color: var(--primary-purple);
 }
 
-/* Error 404 Page Styling */
+/* Error Page Styling */
 .error-container {
     display: flex;
     flex-direction: column;
@@ -230,14 +230,15 @@ img {
     text-align: center;
 }
 .error-title {
-    font-size: 6rem;
+    font-size: 4rem;
+    margin-bottom: 0;
 }
 .error-message {
-    font-size: 4.27rem;
+    font-size: 2rem;
 }
 .error-button {
-    font-size: 3.4rem;
-    margin-bottom: 0.6rem;
+    font-size: 3rem;
+    margin-bottom: 4rem;
     padding: 0.3rem 1.7rem;
     background-color: var(--primary-blue);
     color: white;

@@ -94,6 +94,11 @@ def logout():
 def page_not_found(e):
     return render_template("404.html"), 404
 
+# Error 403 handler
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template("403.html"), 403
+
 # Make the data of the current logged in user available to all templates
 @app.context_processor
 def inject_user():

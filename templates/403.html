@@ -1,0 +1,13 @@
+<!-- Extend the layout.html file onto the Error 403 page -->
+{% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title %}On Repeat - Access Denied{% endblock %}
+<!-- Error 403 page main content block -->
+{% block content %}
+<div class="error-container">
+    <h1 class="error-title">Error 403</h1>
+    <h2>Access Denied</h2>
+    <p class="error-message">You don't have permission to access this page!</p>
+    <a href="{{ url_for('home') }}" class="error-button">Return Home</a>
+</div>
+{% endblock %}
