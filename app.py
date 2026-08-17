@@ -285,8 +285,8 @@ def edit_profile():
         return redirect(url_for('login'))
     usersql = """SELECT * FROM User WHERE user_id = ?"""
     user = query_db(usersql, (session['user_id'],), one=True)
-    editsql = """UPDATE User SET username = ?, user_bio = ? WHERE user_id = ?"""
-    editpasswordsql = """UPDATE User SET username = ?, user_bio = ?, password = ? WHERE user_id = ?"""
+    editsql = """UPDATE User SET username = ?, user_bio = ?, profile_picture = ? WHERE user_id = ?"""
+    editpasswordsql = """UPDATE User SET username = ?, user_bio = ?, password = ?, profile_picture = ? WHERE user_id = ?"""
     if user is None:
         abort(404)
     if request.method == 'POST':
@@ -295,6 +295,7 @@ def edit_profile():
         current_password = request.form['current_password']
         new_password = request.form['new_password']
         profile_picture = request.files['profile_picture']
+        profile_filename = user['profile_picture']
         if any(word in bio.lower() for word in BANNED_WORDS):
             return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Your bio contains words that are not allowed!")
         if len(username) < 3:
@@ -326,14 +327,20 @@ def edit_profile():
                 return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Profile picture must be a PNG, JPG, JPEG, GIF, or WEBP file!")
             filename = secure_filename(profile_picture.filename)
             extension = filename.rsplit('.', 1)[1].lower()
-            filename = f"profile_{session['user_id']}.extension"
-            filepath = os.path.join('static', 'images', filename)
+            new_filename = f"profile_{session['user_id']}.{extension}"
+            filepath = os.path.join('static', 'images', new_filename)
             profile_picture.save(filepath)
+            old_filename = user['profile_picture']
+            if old_filename.startswith(f"profile_{session['user_id']}.") and old_filename != new_filename:
+                old_filepath = os.path.join('static', 'images', old_filename)
+                if os.path.exists(old_filepath):
+                    os.remove(old_filepath)
+            profile_filename = new_filename
         db = get_db()
         if current_password or new_password:
-            db.execute(editpasswordsql, (username, bio, hashed_password, session['user_id']))
+            db.execute(editpasswordsql, (username, bio, hashed_password, profile_filename, session['user_id']))
         else:
-            db.execute(editsql, (username, bio, session['user_id']))
+            db.execute(editsql, (username, bio, profile_filename, session['user_id']))
         db.commit()
         session['username'] = username
         return redirect(url_for('profile'))
