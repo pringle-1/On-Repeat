@@ -278,8 +278,15 @@ def edit_profile():
         return redirect(url_for('login'))
     usersql = """SELECT * FROM User WHERE user_id = ?"""
     user = query_db(usersql, (session['user_id'],), one=True)
+    editbiosql = """UPDATE User SET user_bio = ? WHERE user_id = ?"""
     if user is None:
         abort(404)
+    if request.method == 'POST':
+        bio = request.form['bio']
+        db = get_db()
+        db.execute(editbiosql,(bio, session['user_id']))
+        db.commit()
+        return redirect(url_for('profile'))
     return render_template("edit_profile.html", user=user)
 
 # Route for other user profiles

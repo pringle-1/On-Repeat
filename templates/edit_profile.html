@@ -1,2 +1,25 @@
 <!-- Extend the layout.html file onto the Edit Profile page -->
 {% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title %}On Repeat - Edit Profile{% endblock %}
+<!-- Edit profile page main content block -->
+{% block content %}
+<!-- Card for account information -->
+<div class="profile-container">
+    <div class="profile-card">
+        <h1 class="username">My Profile</h1>
+        <div class="profile-info">
+            <div class="profile-left">
+                <img class="profile-picture" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}{% if current_user['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
+            </div>
+            <div class="profile-right">
+                <form method="POST" autocomplete="off">
+                    <label for="bio">Bio</label><br>
+                    <textarea id="bio" name="bio" rows="6" cols="50">{{ user['user_bio'] or '' }}</textarea><br>
+                <button type="submit">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

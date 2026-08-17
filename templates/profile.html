@@ -14,7 +14,11 @@
             </div>
             <div class="profile-right">
                 <h2 class="join-date">Date Joined: {{ current_user['date_joined'] }}</h2>
-                <h3 class="bio">About Me: <em>{{ current_user['user_bio'] }}</em></h3>
+                {% if current_user['user_bio'] %}
+                    <h3 class="bio">About Me: <em>{{ current_user['user_bio'] }}</em></h3>
+                {% else %}
+                    <h3 class="bio">About me: <em>No bio yet! <a href="{{ url_for('edit_profile') }}">Edit profile</a> to add one.</em></h3>
+                {% endif %}
                 <a href="{{ url_for('edit_profile') }}">Edit Profile</a>
             </div>
         </div>
