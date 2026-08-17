@@ -7,15 +7,26 @@
 <!-- Card for account information -->
 <div class="profile-container">
     <div class="profile-card">
-        <h1 class="username">My Profile</h1>
+        <h1 class="username">My Profile Editor</h1>
         <div class="profile-info">
             <div class="profile-left">
                 <img class="profile-picture" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}{% if current_user['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
             </div>
             <div class="profile-right">
-                <form method="POST" autocomplete="off">
+                <form method="POST" enctype="multipart/form-data" autocomplete="off">
+                    {% if error %}
+                        <p class="error">{{ error }}</p>
+                    {% endif %}
+                    <label for="username">Username</label><br>
+                    <input type="text" id="username" name="username" value="{{ username if username is defined else user['username'] }}" required><br><br>
                     <label for="bio">Bio</label><br>
-                    <textarea id="bio" name="bio" rows="6" cols="50">{{ user['user_bio'] or '' }}</textarea><br>
+                    <textarea id="bio" name="bio" rows="6" cols="45">{{ bio if bio is defined else user['user_bio'] or '' }}</textarea><br>
+                    <label for="profile_picture">Profile Picture</label><br>
+                    <input type="file" id="profile_picture" name="profile_picture" accept="image/*"><br><br>
+                    <label for="current_password">Current Password</label><br>
+                    <input type="password" id="current_password" name="current_password" placeholder="Current Password"><br><br>
+                    <label for="new_password">New Password</label><br>
+                    <input type="password" id="new_password" name="new_password" placeholder="New Password"><br><br>
                 <button type="submit">Save Changes</button>
                 </form>
             </div>

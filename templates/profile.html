@@ -7,7 +7,7 @@
 <!-- Card for account information -->
 <div class="profile-container">
     <div class="profile-card">
-        <h1 class="username">My Profile</h1>
+        <h1 class="username">My Profile (<em>{{current_user['username'] }}</em>)</h1>
         <div class="profile-info">
             <div class="profile-left">
                 <img class="profile-picture" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}{% if current_user['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
@@ -17,7 +17,7 @@
                 {% if current_user['user_bio'] %}
                     <h3 class="bio">About Me: <em>{{ current_user['user_bio'] }}</em></h3>
                 {% else %}
-                    <h3 class="bio">About me: <em>No bio yet! <a href="{{ url_for('edit_profile') }}">Edit profile</a> to add one.</em></h3>
+                    <h3 class="bio">About Me: <em>No bio yet! <a href="{{ url_for('edit_profile') }}">Edit profile</a> to add one.</em></h3>
                 {% endif %}
                 <a href="{{ url_for('edit_profile') }}">Edit Profile</a>
             </div>

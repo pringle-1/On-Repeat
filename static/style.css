@@ -129,6 +129,9 @@ footer {
     border-radius: 35px;
     overflow: hidden;
 }
+textarea {
+    resize: none;
+}
 
 /* Global Styling */
 img {
@@ -259,17 +262,28 @@ img {
     border: 5px solid black;
     border-radius: 35px;
 }
+.profile-left {
+    width: 300px;
+    flex-shrink: 0;
+}
 .profile-picture {
     width: 300px;
     height: 300px;
     border-radius: 1.7rem;
     object-fit: cover;
 }
+.profile-right {
+    flex: 1;
+    min-width: 0;
+}
 .profile-info {
     display: flex;
     gap: 2.5rem;
     align-items: flex-start;
     text-align: left;
+}
+.bio {
+    overflow-wrap: anywhere;
 }
 .username {
     text-decoration: underline;

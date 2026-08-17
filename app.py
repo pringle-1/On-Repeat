@@ -5,12 +5,15 @@ A site that allows users to review albums, comment on reviews, and reply to comm
 from flask import Flask, render_template, request, redirect, url_for, session, g, abort
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 import sqlite3
+import os
 # Create app instance and secret key
 app = Flask(__name__)
 app.secret_key = 'onrepeatsecretkey'
 
 DATABASE = 'onrepeat.db'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 # Open and read bannedwords.txt and badpasswords.txt
 with open('bannedwords.txt', 'r') as f:
@@ -24,6 +27,10 @@ def get_db():
         g.db = sqlite3.connect(DATABASE)
         g.db.row_factory = sqlite3.Row
     return g.db
+
+# Check that uploaded profile picture files have an allowed file extension
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Close database connection after every request
 @app.teardown_appcontext
@@ -46,22 +53,22 @@ def register():
         username = request.form['username']
         password = request.form['password']
         if len(username) < 3:
-            return render_template("register.html", error="Username must be at least 3 characters!", username=username)
+            return render_template("register.html", username=username, error="Username must be at least 3 characters!")
         if len(username) > 20:
-            return render_template("register.html", error="Username must be 20 characters or less!", username=username)
+            return render_template("register.html", username=username, error="Username must be 20 characters or less!")
         if ' ' in username:
-            return render_template("register.html", error="Username cannot contain spaces!")
+            return render_template("register.html", username=username, error="Username cannot contain spaces!")
         if any(word in username.casefold() for word in BANNED_WORDS):
-            return render_template("register.html", error="That username is not allowed!")
+            return render_template("register.html", username=username, error="That username is not allowed!")
         if len(password) < 8:
-            return render_template("register.html", error="Password must be at least 8 characters!", username=username)
+            return render_template("register.html", username=username, error="Password must be at least 8 characters!")
         if password in BAD_PASSWORDS:
-            return render_template("register.html", error="Weak password, choose a stronger one!", username=username)
+            return render_template("register.html", username=username, error="Weak password, choose a stronger one!")
         hashed_password = generate_password_hash(password)
         db = get_db()
         existing = query_db("SELECT * FROM User WHERE LOWER(username) = LOWER(?)", (username,), one=True)
         if existing:
-            return render_template("register.html", error="Username already taken!", username=username)
+            return render_template("register.html", username=username, error="Username already taken!")
         db.execute('INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)', (username, hashed_password, date.today().strftime('%d/%m/%Y')))
         db.commit()
         return redirect(url_for('login'))
@@ -75,9 +82,9 @@ def login():
         password = request.form['password']
         user = query_db('SELECT * FROM user WHERE LOWER(username) = LOWER(?)', (username,), one=True)
         if user is None:
-            return render_template("login.html", error="User not found!", username=username)
+            return render_template("login.html", username=username, error="User not found!")
         if not check_password_hash(user['password'], password):
-            return render_template("login.html", error="Incorrect password!", username=username)
+            return render_template("login.html", username=username, error="Incorrect password!")
         session['user_id'] = user['user_id']
         session['username'] = user['username']
         return redirect(url_for('home'))
@@ -278,14 +285,57 @@ def edit_profile():
         return redirect(url_for('login'))
     usersql = """SELECT * FROM User WHERE user_id = ?"""
     user = query_db(usersql, (session['user_id'],), one=True)
-    editbiosql = """UPDATE User SET user_bio = ? WHERE user_id = ?"""
+    editsql = """UPDATE User SET username = ?, user_bio = ? WHERE user_id = ?"""
+    editpasswordsql = """UPDATE User SET username = ?, user_bio = ?, password = ? WHERE user_id = ?"""
     if user is None:
         abort(404)
     if request.method == 'POST':
+        username = request.form['username']
         bio = request.form['bio']
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        profile_picture = request.files['profile_picture']
+        if any(word in bio.lower() for word in BANNED_WORDS):
+            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Your bio contains words that are not allowed!")
+        if len(username) < 3:
+            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username must be at least 3 characters!")
+        if len (username) > 20:
+            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username must be 20 characters or less!")
+        if ' ' in username:
+            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username cannot contain spaces!")
+        if any(word in username.lower() for word in BANNED_WORDS):
+            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="That username is not allowed!")
+        takenusernamesql = """SELECT * FROM User WHERE LOWER(username) = LOWER(?) AND user_id != ?"""
+        takenusername = query_db(takenusernamesql, (username, session['user_id']), one=True)
+        if takenusername:
+            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username already taken!")
+        if current_password or new_password:
+            if not current_password or not new_password:
+                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Enter both your current and new password!")
+            if not check_password_hash(user['password'], current_password):
+                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Current password is incorrect!")
+            if new_password == current_password:
+                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Your new password cannot be the same as your current password!")
+            if len(new_password) < 8:
+                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="New password must be at least 8 characters!")
+            if new_password in BAD_PASSWORDS:
+                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Weak password, choose a stronger one!")
+            hashed_password = generate_password_hash(new_password)
+        if profile_picture and profile_picture.filename:
+            if not allowed_file(profile_picture.filename):
+                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Profile picture must be a PNG, JPG, JPEG, GIF, or WEBP file!")
+            filename = secure_filename(profile_picture.filename)
+            extension = filename.rsplit('.', 1)[1].lower()
+            filename = f"profile_{session['user_id']}.extension"
+            filepath = os.path.join('static', 'images', filename)
+            profile_picture.save(filepath)
         db = get_db()
-        db.execute(editbiosql,(bio, session['user_id']))
+        if current_password or new_password:
+            db.execute(editpasswordsql, (username, bio, hashed_password, session['user_id']))
+        else:
+            db.execute(editsql, (username, bio, session['user_id']))
         db.commit()
+        session['username'] = username
         return redirect(url_for('profile'))
     return render_template("edit_profile.html", user=user)
 
