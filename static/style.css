@@ -513,3 +513,41 @@ img {
 .comment-text {
     margin-bottom: 0;
 }
+
+/* Reply Styling */
+.reply-card {
+    display: flex;
+    margin-top: 1rem;
+    margin-left: 2rem;
+    padding: 0.5rem 0.8rem;
+    gap: 0.8rem;
+    border-left: 3px solid black;
+}
+.reply-left {
+    width: 50px;
+    display: flex;
+    justify-content: center;
+}
+.reply-profile-picture {
+    width: 45px;
+    height: 45px;
+    border: 2px solid black;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.reply-right {
+    flex: 1;
+    min-width: 0;
+}
+.reply-header {
+    margin-top: 0;
+    margin-bottom: 0.4rem;
+}
+.reply-header em {
+    margin-left: 0.7rem;
+    font-size: 0.85rem;
+}
+.reply-text {
+    margin-top: 0;
+}
