@@ -194,7 +194,7 @@ def all_reviews():
     ORDER BY comment_count DESC;
     """
     reviews = query_db(reviewsql)
-    return render_template("reviews_all.html", reviews=reviews)
+    return render_template("all_reviews.html", reviews=reviews)
 
 # Route to read the reviews for one album
 @app.route('/album/<int:id>/reviews')

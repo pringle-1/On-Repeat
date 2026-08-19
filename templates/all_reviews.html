@@ -18,7 +18,10 @@
                 <div class="review-right">
                     <h2>{{ review['album_title'] }}</h2>
                     <p><b>Artist: </b>{{ review['artist_name'] }}</p>
-                    <p><b>Review by: </b>{{ review[] }}</p>
+                    <p><b>Review by: </b>{{ review['username'] }}</p>
+                    <p><b>Rating: </b>{{ review['rating'] }}/10</p>
+                    <p><b>Comments: </b>{{ review['comment_count'] }}</p>
+                    <p>{{ review['review_text'] }}</p>
                 </div>
             </div>
         </a>
