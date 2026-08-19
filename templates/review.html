@@ -53,7 +53,7 @@
     <h2>Comments</h2>
     {% if current_user %}
         <form method="POST" autocomplete="off">
-            <textarea name="comment_text" placeholder="Write a comment..." required></textarea><br>
+            <textarea name="comment_text" placeholder="Write a comment..." required>{{ comment_text if comment_text is defined else '' }}</textarea><br>
             <button type="submit">Post Comment</button>
         </form>
     {% else %}
@@ -63,6 +63,9 @@
                 to comment!
             </em>
         </p>
+    {% endif %}
+    {% if comment_error %}
+        <p class="error">{{ comment_error }}</p>
     {% endif %}
     <hr>
     {% if comments %}
@@ -90,9 +93,12 @@
                     {% endif %}
                     {% if current_user %}
                         <form method="POST" action="{{ url_for('reply_to_comment', id=comment['comment_id']) }}" autocomplete="off">
-                            <textarea name="reply_text" placeholder="Reply to this comment..." required></textarea><br>
+                            <textarea name="reply_text" placeholder="Reply to this comment..." required>{% if reply_comment_id is defined and reply_comment_id == comment['comment_id'] %}{{ reply_text }}{% endif %}</textarea><br>
                             <button type="submit">Reply</button>
                         </form>
+                    {% endif %}
+                    {% if reply_error and reply_comment_id == comment['comment_id'] %}
+                        <p class="error">{{ reply_error }}</p>
                     {% endif %}
                     {% if comment['replies'] %}
                         {% for reply in comment['replies'] %}

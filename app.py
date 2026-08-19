@@ -181,7 +181,7 @@ def review(id):
         rating = float(request.form['rating'])
         review_text = request.form['review_text']
         if any(word in review_text.lower() for word in BANNED_WORDS):
-            return render_template("review.html", album=album, average_rating=average_rating, rating=rating, review_text=review_text, error="Your review contains words that are not allowed!")
+            return render_template("reviewer.html", album=album, average_rating=average_rating, rating=rating, review_text=review_text, error="Your review contains words that are not allowed!")
         if rating < 0.1 or rating > 10:
             return render_template("reviewer.html", album=album, error="Rating must be between 0.1 and 10.0!")
         db = get_db()
@@ -238,6 +238,8 @@ def review_page(id):
     commentsql = """SELECT Comment.*, User.username, User.profile_picture FROM Comment JOIN User ON Comment.user_id = User.user_id WHERE review_id = ? ORDER BY comment_id DESC;"""
     replysql = """SELECT Reply.*, User.username, User.profile_picture FROM Reply JOIN User ON Reply.user_id = User.user_id WHERE comment_id = ? ORDER BY reply_id ASC;"""
     review = query_db(sql,(id,), True)
+    if review is None:
+        abort(404)
     comments = query_db(commentsql, (id,))
     comment_list = []
     for comment in comments:
@@ -245,12 +247,12 @@ def review_page(id):
         comment_data['replies'] = query_db(replysql, (comment['comment_id'],))
         comment_list.append(comment_data)
     comments = comment_list
-    if review is None:
-        abort(404)
     if request.method == 'POST':
         if 'user_id' not in session:
             return redirect(url_for('login'))
         comment_text = request.form['comment_text']
+        if any(word in comment_text.lower() for word in BANNED_WORDS):
+            return render_template("review.html", review=review, comments=comments, comment_text=comment_text, comment_error="Your comment contains words that are not allowed!")
         db = get_db()
         db.execute('INSERT INTO COMMENT (user_id, review_id, comment_text, comment_date) VALUES (?, ?, ?, ?)', (session['user_id'], id, comment_text, date.today().strftime('%d/%m/%Y')))
         db.commit()
@@ -269,6 +271,32 @@ def reply_to_comment(id):
     if comment is None:
         abort(404)
     reply_text = request.form['reply_text']
+    if any(word in reply_text.lower() for word in BANNED_WORDS):
+        reviewsql = """SELECT Review.*, User.username, User.profile_picture, Album.album_title, Album.album_cover, Artist.artist_id, Artist.artist_name
+                 FROM Review
+                 JOIN User ON Review.user_id = User.user_id
+                 JOIN Album ON Review.album_id = Album.album_id
+                 JOIN Artist ON Album.artist_id = Artist.artist_id
+                 WHERE review_id = ?;"""
+        allcommentsql = """SELECT Comment.*, User.username, User.profile_picture
+                           FROM Comment
+                           JOIN User ON Comment.user_id = User.user_id
+                           WHERE review_id = ?
+                           ORDER BY comment_id DESC;"""
+        replysql = """SELECT Reply.*, User.username, User.profile_picture
+                      FROM Reply
+                      JOIN User ON Reply.user_id = User.user_id
+                      WHERE comment_id = ?
+                      ORDER BY reply_id ASC;"""
+        review = query_db(reviewsql, (comment['review_id'],), True)
+        comments = query_db(allcommentsql, (comment['review_id'],))
+        comment_list = []
+        for current_comment in comments:
+            comment_data = dict(current_comment)
+            comment_data['replies'] = query_db(replysql, (current_comment['comment_id'],))
+            comment_list.append(comment_data)
+        comments = comment_list
+        return render_template("review.html", review=review, comments=comments, reply_text=reply_text, reply_comment_id=id, reply_error="Your reply contains words that are not allowed!")
     db = get_db()
     db.execute(replysql, (session['user_id'], id, reply_text, date.today().strftime('%d/%m/%Y')))
     db.commit()
