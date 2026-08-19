@@ -112,6 +112,11 @@
                                     <p class="reply-text">
                                         {{ reply['reply_text'] }}
                                     </p>
+                                    {% if current_user and current_user['user_id'] == reply['user_id'] %}
+                                        <form method="POST" action="{{ url_for('delete_reply', id=reply['reply_id']) }}" onsubmit="return confirm('Are you sure you want to delete this reply?')">
+                                            <button type="submit">Delete Reply</button>
+                                        </form>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}

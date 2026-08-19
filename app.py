@@ -180,6 +180,8 @@ def review(id):
     if request.method == 'POST':
         rating = float(request.form['rating'])
         review_text = request.form['review_text']
+        if any(word in review_text.lower() for word in BANNED_WORDS):
+            return render_template("review.html", album=album, average_rating=average_rating, rating=rating, review_text=review_text, error="Your review contains words that are not allowed!")
         if rating < 0.1 or rating > 10:
             return render_template("reviewer.html", album=album, error="Rating must be between 0.1 and 10.0!")
         db = get_db()
@@ -256,7 +258,6 @@ def review_page(id):
     return render_template("review.html", review=review, comments=comments)
 
 
-
 # Route for writing replies to comments
 @app.route('/comment/<int:id>/reply', methods=['POST'])
 def reply_to_comment(id):
@@ -310,13 +311,15 @@ def delete_review(id):
         return redirect(url_for('login'))
     reviewsql = """SELECT * FROM Review WHERE review_id = ?"""
     review = query_db(reviewsql, (id,),True)
+    deletesql = """DELETE FROM Review WHERE review_id = ?"""
+    commentdeletesql = """DELETE FROM Comment WHERE review_id = ?"""
     if review is None:
         abort(404)
     if review['user_id'] != session['user_id']:
         abort(403)
     db = get_db()
-    db.execute('DELETE FROM Comment WHERE review_id = ?', (id,))
-    db.execute('DELETE FROM Review WHERE review_id = ?', (id,))
+    db.execute(commentdeletesql, (id,))
+    db.execute(deletesql, (id,))
     db.commit()
     return redirect(url_for('reviews', id=review['album_id']))
 
@@ -329,10 +332,32 @@ def delete_comment(id):
     commentsql = """SELECT * FROM Comment WHERE comment_id = ?"""
     comment = query_db(commentsql, (id,), one=True)
     deletesql = """DELETE FROM Comment WHERE comment_id = ?"""
+    replydeletesql = """DELETE FROM Reply WHERE comment_id = ?"""
     if comment is None:
         abort(404)
     if comment['user_id'] != session['user_id']:
         abort(403)
+    db = get_db()
+    db.execute(replydeletesql, (id,))
+    db.execute(deletesql, (id,))
+    db.commit()
+    return redirect(url_for('review_page', id=comment['review_id']))
+
+
+# Route for deleting a reply
+@app.route('/reply/<int:id>/delete', methods=['POST'])
+def delete_reply(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    replysql = """SELECT * FROM Reply WHERE reply_id = ?"""
+    reply = query_db(replysql, (id,), one=True)
+    deletesql = """DELETE FROM Reply WHERE reply_id = ?"""
+    commentsql = """SELECT review_id FROM Comment WHERE comment_id = ?"""
+    comment = query_db(commentsql, (reply['comment_id'],), one=True)
+    if reply is None:
+        abort(404)
+    if reply['user_id'] != session['user_id']:
+        abort (403)
     db = get_db()
     db.execute(deletesql, (id,))
     db.commit()
