@@ -88,6 +88,34 @@
                             <button type="submit">Delete Comment</button>
                         </form>
                     {% endif %}
+                    {% if current_user %}
+                        <form method="POST" action="{{ url_for('reply_to_comment', id=comment['comment_id']) }}" autocomplete="off">
+                            <textarea name="reply_text" placeholder="Reply to this comment..." required></textarea><br>
+                            <button type="submit">Reply</button>
+                        </form>
+                    {% endif %}
+                    {% if comment['replies'] %}
+                        {% for reply in comment['replies'] %}
+                            <div class="reply-card">
+                                <div class="reply-left">
+                                    <a href="{{ url_for('user', id=reply['user_id']) }}">
+                                        <img class="reply-profile-picture" src="{{ url_for('static', filename='images/' + reply['profile_picture']) }}" alt="{{ reply['username'] }}{% if reply['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
+                                    </a>
+                                </div>
+                                <div class="reply-right">
+                                    <p class="reply-header">
+                                        <a href="{{ url_for('user', id=reply['user_id']) }}">
+                                            <b>{{ reply['username'] }}</b>
+                                        </a>
+                                        <em>{{ reply['reply_date'] }}</em>
+                                    </p>
+                                    <p class="reply-text">
+                                        {{ reply['reply_text'] }}
+                                    </p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
