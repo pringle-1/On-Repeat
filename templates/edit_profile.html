@@ -29,6 +29,11 @@
                     <input type="password" id="new_password" name="new_password" placeholder="New Password"><br><br>
                 <button type="submit">Save Changes</button>
                 </form>
+                {% if user['profile_picture'] != 'profile_placeholder.png' %}
+                    <form method="POST" action="{{ url_for('clear_profile_picture') }}" onsubmit="return confirm('Are you sure you want to remove your profile picture? This will return your profile picture to the placeholder image.')">
+                        <button type="submit">Clear Profile Picture</button>
+                    </form>
+                {% endif %}
             </div>
         </div>
     </div>

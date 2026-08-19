@@ -1,0 +1,27 @@
+<!-- Extend the layout.html file onto the All Reviews page -->
+{% extends "layout.html" %}
+<!-- Set the page title that displays on the tab -->
+{% block title %}On Repeat - Reviews{% endblock %}
+<!-- Albums page main content block -->
+{% block content %}
+<!-- Data display -->
+<div class="page-header-container">
+    <h1 class="page-header">Reviews</h1>
+</div>
+<div class="reviews-container">
+    {% for review in reviews %}
+        <a href="{{ url_for('review_page', id=review['review_id']) }}" class="review-link">
+            <div class="reviews-card">
+                <div class="review-left">
+                    <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}{% if review['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
+                </div>
+                <div class="review-right">
+                    <h2>{{ review['album_title'] }}</h2>
+                    <p><b>Artist: </b>{{ review['artist_name'] }}</p>
+                    <p><b>Review by: </b>{{ review[] }}</p>
+                </div>
+            </div>
+        </a>
+    {% endfor %}
+</div>
+{% endblock %}

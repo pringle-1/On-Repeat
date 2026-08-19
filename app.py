@@ -173,6 +173,29 @@ def review(id):
             return render_template("reviewer.html", album=album, error="You have already reviewed this album!")
     return render_template("reviewer.html", album=album, average_rating=average_rating, review=review)
 
+# Route for all reviews page
+@app.route('/reviews')
+def all_reviews():
+    reviewsql = """
+    SELECT
+        Review.*,
+        User.username,
+        user.profile_picture,
+        Album.album_title,
+        Album.album_cover,
+        Artist.artist_name,
+        COUNT(Comment.comment_id) AS comment_count
+    FROM Review
+    JOIN User ON Review.user_id = User.user_id
+    JOIN Album ON Review.album_id = Album.album_id
+    JOIN Artist ON Album.artist_id = Artist.artist_id
+    LEFT JOIN Comment ON Review.review_id = Comment.review_id
+    GROUP BY Review.review_id
+    ORDER BY comment_count DESC;
+    """
+    reviews = query_db(reviewsql)
+    return render_template("reviews_all.html", reviews=reviews)
+
 # Route to read the reviews for one album
 @app.route('/album/<int:id>/reviews')
 def reviews(id):
@@ -249,6 +272,23 @@ def delete_review(id):
     db.execute('DELETE FROM Review WHERE review_id = ?', (id,))
     db.commit()
     return redirect(url_for('reviews', id=review['album_id']))
+
+# Route for deleting a comment
+@app.route('/comment/<int:id>/delete', methods=['POST'])
+def delete_comment(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    commentsql = """SELECT * FROM Comment WHERE comment_id = ?"""
+    comment = query_db(commentsql, (id,), one=True)
+    deletesql = """DELETE FROM Comment WHERE comment_id = ?"""
+    if comment is None:
+        abort(404)
+    if comment['user_id'] != session['user_id']:
+        abort(403)
+    db = get_db()
+    db.execute(deletesql, (id,))
+    db.commit()
+    return redirect(url_for('review_page', id=comment['review_id']))
 
 # Route for artists page
 @app.route('/artists')
@@ -345,6 +385,26 @@ def edit_profile():
         session['username'] = username
         return redirect(url_for('profile'))
     return render_template("edit_profile.html", user=user)
+
+# Route for clearing profile picture
+@app.route('/profile/edit/clear-picture', methods=['POST'])
+def clear_profile_picture():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    usersql = """SELECT profile_picture FROM User WHERE user_id = ?"""
+    user = query_db(usersql, (session['user_id'],), one=True)
+    updatesql = """UPDATE User SET profile_picture = ? WHERE user_id = ?"""
+    if user is None:
+        abort(404)
+    old_filename = user['profile_picture']
+    if old_filename.startswith(f"profile_{session['user_id']}."):
+        old_filepath = os.path.join('static', 'images', old_filename)
+        if os.path.exists(old_filepath):
+            os.remove(old_filepath)
+    db = get_db()
+    db.execute(updatesql, ('profile_placeholder.png', session['user_id']))
+    db.commit()
+    return redirect(url_for('edit_profile'))
 
 # Route for other user profiles
 @app.route('/user/<int:id>')
