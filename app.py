@@ -1,7 +1,9 @@
 """On Repeat 12DTP Social Music Website/Application
-A site that allows users to review albums, comment on reviews, and reply to comments"""
+A site that allows users to review albums, comment on reviews, and reply to comments
+Created by Fibitius Chan"""
 
-# Import models
+
+# Import important models
 from flask import Flask, render_template, request, redirect, url_for, session, g, abort
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,14 +14,17 @@ import os
 app = Flask(__name__)
 app.secret_key = 'onrepeatsecretkey'
 
+
 DATABASE = 'onrepeat.db'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
 
 # Open and read bannedwords.txt and badpasswords.txt
 with open('bannedwords.txt', 'r') as f:
     BANNED_WORDS = [line.strip().lower() for line in f]
 with open('badpasswords.txt', 'r') as f:
     BAD_PASSWORDS = [line.strip() for line in f]
+
 
 # Database connection function
 def get_db():
@@ -28,9 +33,11 @@ def get_db():
         g.db.row_factory = sqlite3.Row
     return g.db
 
+
 # Check that uploaded profile picture files have an allowed file extension
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # Close database connection after every request
 @app.teardown_appcontext
@@ -39,12 +46,14 @@ def close_db(error):
     if db is not None:
         db.close()
 
+
 # Function to pull data from the database with SQL queries
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
+
 
 # Route for register (account creation) page
 @app.route('/register', methods=['GET', 'POST'])
@@ -74,6 +83,7 @@ def register():
         return redirect(url_for('login'))
     return render_template("register.html")
 
+
 # Route for login (page)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -90,21 +100,25 @@ def login():
         return redirect(url_for('home'))
     return render_template("login.html")
 
+
 # Route for logout
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('home'))
 
+
 # Error 404 handler
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
 
+
 # Error 403 handler
 @app.errorhandler(403)
 def forbidden(e):
     return render_template("403.html"), 403
+
 
 # Make the data of the current logged in user available to all templates
 @app.context_processor
@@ -114,6 +128,7 @@ def inject_user():
         user = query_db("SELECT * FROM User WHERE user_id = ?", (session['user_id'],), one=True)
     return dict(current_user=user)
 
+
 # Route for index (home) page
 @app.route('/')
 def home():
@@ -122,6 +137,7 @@ def home():
     albums = query_db(sql)
     return render_template("index.html", active_page="home", albums=albums)
 
+
 # Route for albums page
 @app.route('/albums')
 def albums():
@@ -129,6 +145,7 @@ def albums():
     sql = """SELECT * FROM album;"""
     albums = query_db(sql)
     return render_template("albums.html", active_page="albums", albums=albums)
+
 
 # Route for one album's page
 @app.route('/album/<int:id>')
@@ -144,6 +161,7 @@ def album(id):
     if average_rating is not None:
         average_rating = round(average_rating, 1)
     return render_template("album.html", album=album, average_rating=average_rating)
+
 
 # Route to write an album review
 @app.route('/album/<int:id>/review', methods=['GET', 'POST'])
@@ -173,6 +191,7 @@ def review(id):
             return render_template("reviewer.html", album=album, error="You have already reviewed this album!")
     return render_template("reviewer.html", album=album, average_rating=average_rating, review=review)
 
+
 # Route for all reviews page
 @app.route('/reviews')
 def all_reviews():
@@ -196,6 +215,7 @@ def all_reviews():
     reviews = query_db(reviewsql)
     return render_template("all_reviews.html", active_page="all_reviews", reviews=reviews)
 
+
 # Route to read the reviews for one album
 @app.route('/album/<int:id>/reviews')
 def reviews(id):
@@ -206,6 +226,7 @@ def reviews(id):
     if album is None:
         abort(404)
     return render_template("reviews.html", album=album, reviews=reviews)
+
 
 # Route for one review's page
 @app.route("/review/<int:id>", methods=['GET', 'POST'])
@@ -233,6 +254,25 @@ def review_page(id):
         db.commit()
         return redirect(url_for('review_page', id=id))
     return render_template("review.html", review=review, comments=comments)
+
+
+
+# Route for writing replies to comments
+@app.route('/comment/<int:id>/reply', methods=['POST'])
+def reply_to_comment(id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    commentsql = """SELECT * FROM Comment WHERE comment_id = ?"""
+    comment = query_db(commentsql, (id,), one=True)
+    replysql = """INSERT INTO Reply (user_id, comment_id, reply_text, reply_date) VALUES (?, ?, ?, ?)"""
+    if comment is None:
+        abort(404)
+    reply_text = request.form['reply_text']
+    db = get_db()
+    db.execute(replysql, (session['user_id'], id, reply_text, date.today().strftime('%d/%m/%Y')))
+    db.commit()
+    return redirect(url_for('review_page', id=comment['review_id']))
+
 
 # Route for editing a review
 @app.route('/review/<int:id>/edit', methods=['GET', 'POST'])
@@ -262,6 +302,7 @@ def edit_review(id):
         return redirect(url_for('review_page', id=id))
     return render_template("edit_review.html", review=review, average_rating=average_rating)
 
+
 # Route for deleting a review
 @app.route('/review/<int:id>/delete', methods=['POST'])
 def delete_review(id):
@@ -278,6 +319,7 @@ def delete_review(id):
     db.execute('DELETE FROM Review WHERE review_id = ?', (id,))
     db.commit()
     return redirect(url_for('reviews', id=review['album_id']))
+
 
 # Route for deleting a comment
 @app.route('/comment/<int:id>/delete', methods=['POST'])
@@ -296,6 +338,7 @@ def delete_comment(id):
     db.commit()
     return redirect(url_for('review_page', id=comment['review_id']))
 
+
 # Route for artists page
 @app.route('/artists')
 def artists():
@@ -303,6 +346,7 @@ def artists():
     sql = """SELECT * FROM artist;"""
     artists = query_db(sql)
     return render_template("artists.html", active_page="artists", artists=artists)
+
 
 # Route for one artist's page
 @app.route('/artist/<int:id>')
@@ -315,6 +359,7 @@ def artist(id):
     albums = query_db("SELECT * FROM Album WHERE artist_id = ?", (id,))
     return render_template("artist.html", artist=artist, albums=albums)
 
+
 # Route for my profile page
 @app.route('/profile')
 def profile():
@@ -323,6 +368,7 @@ def profile():
     sql = """SELECT Review.*, Album.album_title, Album.album_cover FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE Review.user_id = ? ORDER BY Review.review_date DESC"""
     reviews = query_db(sql, (session['user_id'],))
     return render_template("profile.html", active_page="profile", reviews=reviews)
+
 
 # Route for editing my profile
 @app.route('/profile/edit', methods=['GET', 'POST'])
@@ -392,6 +438,7 @@ def edit_profile():
         return redirect(url_for('profile'))
     return render_template("edit_profile.html", user=user)
 
+
 # Route for clearing profile picture
 @app.route('/profile/edit/clear-picture', methods=['POST'])
 def clear_profile_picture():
@@ -412,6 +459,7 @@ def clear_profile_picture():
     db.commit()
     return redirect(url_for('edit_profile'))
 
+
 # Route for other user profiles
 @app.route('/user/<int:id>')
 def user(id):
@@ -423,6 +471,8 @@ def user(id):
         abort(404)
     return render_template("user.html", user=user, reviews=reviews)
 
+
 # Run statement
 if __name__ == "__main__":
     app.run(debug=True)
+
