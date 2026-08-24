@@ -14,7 +14,7 @@
             </div>
             <div class="album-right">
                 <p><b>Artist:</b>
-                    <a href="{{ url_for('artist', id=album['artist_id']) }}">
+                    <a href="{{ url_for('artist', artist_id=album['artist_id']) }}">
                         <em>{{ album['artist_name'] }}</em>
                     </a>
                 </p>
@@ -30,13 +30,13 @@
                 <p class="album-about"><b>About Album:</b> <em>{{ album['album_description'] }}</em></p>
                 <div class="review-buttons-container">
                     {% if current_user %}
-                        <a class="review-buttons" href="{{ url_for('review', id=album['album_id']) }}">
+                        <a class="review-buttons" href="{{ url_for('review', album_id=album['album_id']) }}">
                             Write a Review
                         </a><br>
                     {% else %}
                         <a class="review-buttons" href="{{ url_for('login') }}">Login to Review</a>
                     {% endif %}
-                    <a class="review-buttons" href="{{ url_for('reviews', id=album['album_id']) }}">
+                    <a class="review-buttons" href="{{ url_for('reviews', album_id=album['album_id']) }}">
                         Read Reviews
                     </a>
                 </div>

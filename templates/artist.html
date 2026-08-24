@@ -20,7 +20,7 @@
     <!-- Display all the albums by this particular artist -->
     {% if albums %}
         {% for album in albums %}
-            <a href="{{ url_for('album',id=album['album_id']) }}">
+            <a href="{{ url_for('album', album_id=album['album_id']) }}">
                 <!-- Album name then album cover -->
                 <div class="content-card">
                     <h1 class="content-header">{{ album['album_title'] }}</h1>

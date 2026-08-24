@@ -1,1 +1,2 @@
+# Ignore the .env file that stores the secret key so that it is not visible on GitHub, ensuring that it remains secure
 .env

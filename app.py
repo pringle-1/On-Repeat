@@ -67,7 +67,7 @@ def query_db(query, args=(), one=False):
 # Route for register (account creation) page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    registersql = """INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)"""
+    register_sql = """INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)"""
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -88,7 +88,7 @@ def register():
         existing = query_db("SELECT * FROM User WHERE LOWER(username) = LOWER(?)", (username,), one=True)
         if existing:
             return render_template("register.html", username=username, error="Username already taken!")
-        db.execute(registersql, (username, hashed_password, date.today().strftime('%d/%m/%Y')))
+        db.execute(register_sql, (username, hashed_password, date.today().strftime('%d/%m/%Y')))
         db.commit()
         return redirect(url_for('login'))
     return render_template("register.html")
@@ -158,13 +158,13 @@ def albums():
 
 
 # Route for one album's page
-@app.route('/album/<int:id>')
-def album(id):
+@app.route('/album/<int:album_id>')
+def album(album_id):
     # Only one album from its ID
     sql = """SELECT * FROM album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
-    averagerating = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?;"""
-    album = query_db(sql,(id,), True)
-    average = query_db(averagerating, (id,), one=True)
+    average_rating_sql = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?;"""
+    album = query_db(sql, (album_id,), True)
+    average = query_db(average_rating_sql, (album_id,), one=True)
     average_rating = average['average_rating']
     if album is None:
         abort(404)
@@ -174,14 +174,14 @@ def album(id):
 
 
 # Route to write an album review
-@app.route('/album/<int:id>/review', methods=['GET', 'POST'])
-def review(id):
+@app.route('/album/<int:album_id>/review', methods=['GET', 'POST'])
+def review(album_id):
     sql = """SELECT * FROM Album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
-    averagerating = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?;"""
-    average = query_db(averagerating, (id,), one=True)
+    average_rating_sql = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?;"""
+    average = query_db(average_rating_sql, (album_id,), one=True)
     average_rating = average['average_rating']
-    album = query_db(sql,(id,), True)
-    reviewsql = """INSERT INTO Review (user_id, album_id, rating, review_text, review_date) VALUES (?, ?, ?, ?, ?)'"""
+    album = query_db(sql, (album_id,), True)
+    review_sql = """INSERT INTO Review (user_id, album_id, rating, review_text, review_date) VALUES (?, ?, ?, ?, ?)"""
     if album is None:
         abort(404)
     if average_rating is not None:
@@ -202,9 +202,9 @@ def review(id):
             return render_template("reviewer.html", album=album, error="Rating must be between 0.1 and 10.0!")
         db = get_db()
         try:
-            db.execute(reviewsql, (session['user_id'], id, rating, review_text, date.today().strftime('%d/%m/%Y')))
+            db.execute(review_sql, (session['user_id'], album_id, rating, review_text, date.today().strftime('%d/%m/%Y')))
             db.commit()
-            return redirect(url_for('reviews', id=id))
+            return redirect(url_for('reviews', album_id=album_id))
         except sqlite3.IntegrityError:
             return render_template("reviewer.html", album=album, error="You have already reviewed this album!")
     return render_template("reviewer.html", album=album, average_rating=average_rating, review=review)
@@ -213,7 +213,7 @@ def review(id):
 # Route for all reviews page
 @app.route('/reviews')
 def all_reviews():
-    reviewsql = """
+    review_sql = """
     SELECT
         Review.*,
         User.username,
@@ -230,13 +230,13 @@ def all_reviews():
     GROUP BY Review.review_id
     ORDER BY comment_count DESC;
     """
-    reviews = query_db(reviewsql)
+    reviews = query_db(review_sql)
     return render_template("all_reviews.html", active_page="all_reviews", reviews=reviews)
 
 
 # Route to read the reviews for one album
-@app.route('/album/<int:id>/reviews')
-def reviews(id):
+@app.route('/album/<int:album_id>/reviews')
+def reviews(album_id):
     sql = """SELECT Review.*,
                 User.username,
                 User.profile_picture
@@ -245,17 +245,17 @@ def reviews(id):
              ON Review.user_id = User.user_id
              WHERE album_id = ?
              ORDER BY review_id DESC;"""
-    albumsql = """SELECT * FROM Album WHERE album_id = ?;"""
-    album = query_db(albumsql,(id,), True)
-    reviews = query_db(sql,(id,))
+    album_sql = """SELECT * FROM Album WHERE album_id = ?;"""
+    album = query_db(album_sql, (album_id,), True)
+    reviews = query_db(sql, (album_id,))
     if album is None:
         abort(404)
     return render_template("reviews.html", album=album, reviews=reviews)
 
 
 # Route for one review's page
-@app.route("/review/<int:id>", methods=['GET', 'POST'])
-def review_page(id):
+@app.route("/review/<int:review_id>", methods=['GET', 'POST'])
+def review_page(review_id):
     # Only one review from its ID
     sql = """SELECT
                 Review.*,
@@ -271,7 +271,7 @@ def review_page(id):
             JOIN Album ON Review.album_id = Album.album_id
             JOIN Artist ON Album.artist_id = Artist.artist_id
             WHERE review_id = ?;"""
-    commentsql = """SELECT
+    comment_sql = """SELECT
                         Comment.*,
                         User.username,
                         User.profile_picture
@@ -279,7 +279,7 @@ def review_page(id):
                     JOIN User ON Comment.user_id = User.user_id
                     WHERE review_id = ?
                     ORDER BY comment_id DESC;"""
-    replysql = """SELECT
+    reply_sql = """SELECT
                     Reply.*,
                     User.username,
                     User.profile_picture
@@ -287,14 +287,14 @@ def review_page(id):
                 JOIN User ON Reply.user_id = User.user_id
                 WHERE comment_id = ?
                 ORDER BY reply_id ASC;"""
-    review = query_db(sql,(id,), True)
+    review = query_db(sql, (review_id,), True)
     if review is None:
         abort(404)
-    comments = query_db(commentsql, (id,))
+    comments = query_db(comment_sql, (review_id,))
     comment_list = []
     for comment in comments:
         comment_data = dict(comment)
-        comment_data['replies'] = query_db(replysql, (comment['comment_id'],))
+        comment_data['replies'] = query_db(reply_sql, (comment['comment_id'],))
         comment_list.append(comment_data)
     comments = comment_list
     if request.method == 'POST':
@@ -304,69 +304,83 @@ def review_page(id):
         if any(word in comment_text.lower() for word in BANNED_WORDS):
             return render_template("review.html", review=review, comments=comments, comment_text=comment_text, comment_error="Your comment contains words that are not allowed!")
         db = get_db()
-        db.execute('INSERT INTO COMMENT (user_id, review_id, comment_text, comment_date) VALUES (?, ?, ?, ?)', (session['user_id'], id, comment_text, date.today().strftime('%d/%m/%Y')))
+        db.execute('INSERT INTO COMMENT (user_id, review_id, comment_text, comment_date) VALUES (?, ?, ?, ?)', (session['user_id'], review_id, comment_text, date.today().strftime('%d/%m/%Y')))
         db.commit()
-        return redirect(url_for('review_page', id=id))
+        return redirect(url_for('review_page', review_id=review_id))
     return render_template("review.html", review=review, comments=comments)
 
 
 # Route for writing replies to comments
-@app.route('/comment/<int:id>/reply', methods=['POST'])
-def reply_to_comment(id):
+@app.route('/comment/<int:comment_id>/reply', methods=['POST'])
+def reply_to_comment(comment_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    commentsql = """SELECT * FROM Comment WHERE comment_id = ?"""
-    comment = query_db(commentsql, (id,), one=True)
-    replysql = """INSERT INTO Reply (user_id, comment_id, reply_text, reply_date) VALUES (?, ?, ?, ?)"""
+    comment_sql = """SELECT * FROM Comment WHERE comment_id = ?"""
+    comment = query_db(comment_sql, (comment_id,), one=True)
+    reply_sql = """INSERT INTO Reply (user_id, comment_id, reply_text, reply_date) VALUES (?, ?, ?, ?)"""
     if comment is None:
         abort(404)
     reply_text = request.form['reply_text']
     if any(word in reply_text.lower() for word in BANNED_WORDS):
-        reviewsql = """SELECT Review.*, User.username, User.profile_picture, Album.album_title, Album.album_cover, Artist.artist_id, Artist.artist_name
+        review_sql = """SELECT Review.*, User.username, User.profile_picture, Album.album_title, Album.album_cover, Artist.artist_id, Artist.artist_name
                  FROM Review
                  JOIN User ON Review.user_id = User.user_id
                  JOIN Album ON Review.album_id = Album.album_id
                  JOIN Artist ON Album.artist_id = Artist.artist_id
                  WHERE review_id = ?;"""
-        allcommentsql = """SELECT Comment.*, User.username, User.profile_picture
+        all_comment_sql = """SELECT Comment.*, User.username, User.profile_picture
                            FROM Comment
                            JOIN User ON Comment.user_id = User.user_id
                            WHERE review_id = ?
                            ORDER BY comment_id DESC;"""
-        replysql = """SELECT Reply.*, User.username, User.profile_picture
+        reply_sql = """SELECT Reply.*, User.username, User.profile_picture
                       FROM Reply
                       JOIN User ON Reply.user_id = User.user_id
                       WHERE comment_id = ?
                       ORDER BY reply_id ASC;"""
-        review = query_db(reviewsql, (comment['review_id'],), True)
-        comments = query_db(allcommentsql, (comment['review_id'],))
+        review = query_db(review_sql, (comment['review_id'],), True)
+        comments = query_db(all_comment_sql, (comment['review_id'],))
         comment_list = []
         for current_comment in comments:
             comment_data = dict(current_comment)
-            comment_data['replies'] = query_db(replysql, (current_comment['comment_id'],))
+            comment_data['replies'] = query_db(reply_sql, (current_comment['comment_id'],))
             comment_list.append(comment_data)
         comments = comment_list
-        return render_template("review.html", review=review, comments=comments, reply_text=reply_text, reply_comment_id=id, reply_error="Your reply contains words that are not allowed!")
+        return render_template("review.html",
+                               review=review,
+                               comments=comments,
+                               reply_text=reply_text,
+                               reply_comment_id=comment_id,
+                               reply_error="Your reply contains words that are not allowed!")
     db = get_db()
-    db.execute(replysql, (session['user_id'], id, reply_text, date.today().strftime('%d/%m/%Y')))
+    db.execute(reply_sql, (session['user_id'], comment_id, reply_text, date.today().strftime('%d/%m/%Y')))
     db.commit()
-    return redirect(url_for('review_page', id=comment['review_id']))
+    return redirect(url_for('review_page', review_id=comment['review_id']))
 
 
 # Route for editing a review
-@app.route('/review/<int:id>/edit', methods=['GET', 'POST'])
-def edit_review(id):
+@app.route('/review/<int:review_id>/edit', methods=['GET', 'POST'])
+def edit_review(review_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    reviewsql = """SELECT Review.*, Album.album_title, Album.album_cover, Album.release_year, Artist.artist_name FROM Review JOIN Album ON Review.album_id = Album.album_id JOIN Artist ON Album.artist_id = Artist.artist_id WHERE review_id = ?"""
-    review = query_db(reviewsql, (id,), True)
-    editsql = """UPDATE Review SET rating = ?, review_text = ? WHERE review_id = ?"""
+    review_sql = """SELECT
+                        Review.*,
+                        Album.album_title,
+                        Album.album_cover,
+                        Album.release_year,
+                        Artist.artist_name
+                    FROM Review
+                    JOIN Album ON Review.album_id = Album.album_id
+                    JOIN Artist ON Album.artist_id = Artist.artist_id
+                    WHERE review_id = ?"""
+    review = query_db(review_sql, (review_id,), True)
+    edit_sql = """UPDATE Review SET rating = ?, review_text = ? WHERE review_id = ?"""
     if review is None:
         abort(404)
     if review['user_id'] != session['user_id']:
         abort(403)
-    averagerating = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?"""
-    average = query_db(averagerating, (review['album_id'],), True)
+    average_rating_sql = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?"""
+    average = query_db(average_rating_sql, (review['album_id'],), True)
     average_rating = average['average_rating']
     if average_rating is not None:
         average_rating = round(average_rating, 1)
@@ -376,70 +390,70 @@ def edit_review(id):
         if rating < 0.1 or rating > 10.0:
             return render_template("edit_review.html", review=review, average_rating=average_rating, error="Rating must be between 0.1 and 10.0!")
         db = get_db()
-        db.execute(editsql, (rating, review_text, id))
+        db.execute(edit_sql, (rating, review_text, review_id))
         db.commit()
-        return redirect(url_for('review_page', id=id))
+        return redirect(url_for('review_page', review_id=review_id))
     return render_template("edit_review.html", review=review, average_rating=average_rating)
 
 
 # Route for deleting a review
-@app.route('/review/<int:id>/delete', methods=['POST'])
-def delete_review(id):
+@app.route('/review/<int:review_id>/delete', methods=['POST'])
+def delete_review(review_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    reviewsql = """SELECT * FROM Review WHERE review_id = ?"""
-    review = query_db(reviewsql, (id,),True)
-    deletesql = """DELETE FROM Review WHERE review_id = ?"""
-    commentdeletesql = """DELETE FROM Comment WHERE review_id = ?"""
+    review_sql = """SELECT * FROM Review WHERE review_id = ?"""
+    review = query_db(review_sql, (review_id,),True)
+    delete_sql = """DELETE FROM Review WHERE review_id = ?"""
+    comment_delete_sql = """DELETE FROM Comment WHERE review_id = ?"""
     if review is None:
         abort(404)
     if review['user_id'] != session['user_id']:
         abort(403)
     db = get_db()
-    db.execute(commentdeletesql, (id,))
-    db.execute(deletesql, (id,))
+    db.execute(comment_delete_sql, (review_id,))
+    db.execute(delete_sql, (review_id,))
     db.commit()
-    return redirect(url_for('reviews', id=review['album_id']))
+    return redirect(url_for('reviews', album_id=review['album_id']))
 
 
 # Route for deleting a comment
-@app.route('/comment/<int:id>/delete', methods=['POST'])
-def delete_comment(id):
+@app.route('/comment/<int:comment_id>/delete', methods=['POST'])
+def delete_comment(comment_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    commentsql = """SELECT * FROM Comment WHERE comment_id = ?"""
-    comment = query_db(commentsql, (id,), one=True)
-    deletesql = """DELETE FROM Comment WHERE comment_id = ?"""
-    replydeletesql = """DELETE FROM Reply WHERE comment_id = ?"""
+    comment_sql = """SELECT * FROM Comment WHERE comment_id = ?"""
+    comment = query_db(comment_sql, (comment_id,), one=True)
+    delete_sql = """DELETE FROM Comment WHERE comment_id = ?"""
+    reply_delete_sql = """DELETE FROM Reply WHERE comment_id = ?"""
     if comment is None:
         abort(404)
     if comment['user_id'] != session['user_id']:
         abort(403)
     db = get_db()
-    db.execute(replydeletesql, (id,))
-    db.execute(deletesql, (id,))
+    db.execute(reply_delete_sql, (comment_id,))
+    db.execute(delete_sql, (comment_id,))
     db.commit()
-    return redirect(url_for('review_page', id=comment['review_id']))
+    return redirect(url_for('review_page', review_id=comment['review_id']))
 
 
 # Route for deleting a reply
-@app.route('/reply/<int:id>/delete', methods=['POST'])
-def delete_reply(id):
+@app.route('/reply/<int:reply_id>/delete', methods=['POST'])
+def delete_reply(reply_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    replysql = """SELECT * FROM Reply WHERE reply_id = ?"""
-    reply = query_db(replysql, (id,), one=True)
-    deletesql = """DELETE FROM Reply WHERE reply_id = ?"""
-    commentsql = """SELECT review_id FROM Comment WHERE comment_id = ?"""
-    comment = query_db(commentsql, (reply['comment_id'],), one=True)
+    reply_sql = """SELECT * FROM Reply WHERE reply_id = ?"""
+    reply = query_db(reply_sql, (reply_id,), one=True)
     if reply is None:
         abort(404)
+    delete_sql = """DELETE FROM Reply WHERE reply_id = ?"""
+    comment_sql = """SELECT review_id FROM Comment WHERE comment_id = ?"""
+    comment = query_db(comment_sql, (reply['comment_id'],), one=True)
     if reply['user_id'] != session['user_id']:
-        abort (403)
+        abort(403)
     db = get_db()
-    db.execute(deletesql, (id,))
+    db.execute(delete_sql, (reply_id,))
     db.commit()
-    return redirect(url_for('review_page', id=comment['review_id']))
+    return redirect(url_for('review_page', review_id=comment['review_id']))
 
 
 # Route for artists page
@@ -452,14 +466,15 @@ def artists():
 
 
 # Route for one artist's page
-@app.route('/artist/<int:id>')
-def artist(id):
+@app.route('/artist/<int:artist_id>')
+def artist(artist_id):
     # Only one artist from its ID
-    sql = """SELECT * FROM artist WHERE artist_id = ?;"""
-    artist = query_db(sql,(id,), True)
+    artist_sql = """SELECT * FROM artist WHERE artist_id = ?;"""
+    artist = query_db(artist_sql, (artist_id,), True)
+    album_sql = """SELECT * FROM Album WHERE artist_id = ?"""
     if artist is None:
         abort(404)
-    albums = query_db("SELECT * FROM Album WHERE artist_id = ?", (id,))
+    albums = query_db(album_sql, (artist_id,))
     return render_template("artist.html", artist=artist, albums=albums)
 
 
@@ -478,10 +493,10 @@ def profile():
 def edit_profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    usersql = """SELECT * FROM User WHERE user_id = ?"""
-    user = query_db(usersql, (session['user_id'],), one=True)
-    editsql = """UPDATE User SET username = ?, user_bio = ?, profile_picture = ? WHERE user_id = ?"""
-    editpasswordsql = """UPDATE User SET username = ?, user_bio = ?, password = ?, profile_picture = ? WHERE user_id = ?"""
+    user_sql = """SELECT * FROM User WHERE user_id = ?"""
+    user = query_db(user_sql, (session['user_id'],), one=True)
+    edit_sql = """UPDATE User SET username = ?, user_bio = ?, profile_picture = ? WHERE user_id = ?"""
+    edit_password_sql = """UPDATE User SET username = ?, user_bio = ?, password = ?, profile_picture = ? WHERE user_id = ?"""
     if user is None:
         abort(404)
     if request.method == 'POST':
@@ -495,7 +510,7 @@ def edit_profile():
             return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Your bio contains words that are not allowed!")
         if len(username) < 3:
             return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username must be at least 3 characters!")
-        if len (username) > 20:
+        if len(username) > 20:
             return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username must be 20 characters or less!")
         if ' ' in username:
             return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username cannot contain spaces!")
@@ -533,9 +548,9 @@ def edit_profile():
             profile_filename = new_filename
         db = get_db()
         if current_password or new_password:
-            db.execute(editpasswordsql, (username, bio, hashed_password, profile_filename, session['user_id']))
+            db.execute(edit_password_sql, (username, bio, hashed_password, profile_filename, session['user_id']))
         else:
-            db.execute(editsql, (username, bio, profile_filename, session['user_id']))
+            db.execute(edit_sql, (username, bio, profile_filename, session['user_id']))
         db.commit()
         session['username'] = username
         return redirect(url_for('profile'))
@@ -547,9 +562,9 @@ def edit_profile():
 def clear_profile_picture():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    usersql = """SELECT profile_picture FROM User WHERE user_id = ?"""
-    user = query_db(usersql, (session['user_id'],), one=True)
-    updatesql = """UPDATE User SET profile_picture = ? WHERE user_id = ?"""
+    user_sql = """SELECT profile_picture FROM User WHERE user_id = ?"""
+    user = query_db(user_sql, (session['user_id'],), one=True)
+    update_sql = """UPDATE User SET profile_picture = ? WHERE user_id = ?"""
     if user is None:
         abort(404)
     old_filename = user['profile_picture']
@@ -558,18 +573,25 @@ def clear_profile_picture():
         if os.path.exists(old_filepath):
             os.remove(old_filepath)
     db = get_db()
-    db.execute(updatesql, ('profile_placeholder.png', session['user_id']))
+    db.execute(update_sql, ('profile_placeholder.png', session['user_id']))
     db.commit()
     return redirect(url_for('edit_profile'))
 
 
 # Route for other user profiles
-@app.route('/user/<int:id>')
-def user(id):
+@app.route('/user/<int:user_id>')
+def user(user_id):
     sql = """SELECT * FROM User WHERE user_id = ?;"""
-    reviewsql = """SELECT Review.*, Album.album_title, Album.album_cover FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE Review.user_id = ? ORDER BY Review.review_date DESC;"""
-    user = query_db(sql, (id,), True)
-    reviews = query_db(reviewsql, (id,))
+    review_sql = """SELECT
+                        Review.*,
+                        Album.album_title,
+                        Album.album_cover
+                    FROM Review
+                    JOIN Album ON Review.album_id = Album.album_id
+                    WHERE Review.user_id = ?
+                    ORDER BY Review.review_date DESC;"""
+    user = query_db(sql, (user_id,), True)
+    reviews = query_db(review_sql, (user_id,))
     if user is None:
         abort(404)
     return render_template("user.html", user=user, reviews=reviews)

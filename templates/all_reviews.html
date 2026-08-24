@@ -10,7 +10,7 @@
 </div>
 <div class="reviews-container">
     {% for review in reviews %}
-        <a href="{{ url_for('review_page', id=review['review_id']) }}" class="review-link">
+        <a href="{{ url_for('review_page', review_id=review['review_id']) }}" class="review-link">
             <div class="reviews-card">
                 <div class="review-left">
                     <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}{% if review['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">

@@ -10,23 +10,23 @@
 <div class="reviews-container">
     <div class="reviews-card">
         <div class="review-left">
-            <a href="{{ url_for('user', id=review['user_id']) }}">
+            <a href="{{ url_for('user', user_id=review['user_id']) }}">
                 <img class="review-profile-picture" src="{{ url_for('static', filename='images/' + review['profile_picture']) }}" alt="{{ review['username'] }}{% if review['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture"> 
             </a>
         </div>
         <div class="review-right">
             <h2>
-                <a href="{{ url_for('user', id=review['user_id']) }}">{{ review['username'] }}</a>
+                <a href="{{ url_for('user', user_id=review['user_id']) }}">{{ review['username'] }}</a>
             </h2>
             <p>
                 <b>Album:</b>
-                <a href="{{ url_for('album', id=review['album_id']) }}">
+                <a href="{{ url_for('album', album_id=review['album_id']) }}">
                     <em>{{ review['album_title'] }}</em>
                 </a>                
             </p>
             <p>
                 <b>Artist:</b>
-                <a href="{{ url_for('artist', id=review['artist_id']) }}">
+                <a href="{{ url_for('artist', artist_id=review['artist_id']) }}">
                     <em>{{ review['artist_name'] }}</em>
                 </a>         
             </p>
@@ -43,10 +43,10 @@
         </div>
     </div>
     {% if current_user and current_user['user_id'] == review['user_id'] %}
-        <a href="{{ url_for('edit_review', id=review['review_id']) }}">
+        <a href="{{ url_for('edit_review', review_id=review['review_id']) }}">
             Edit Review
         </a>
-        <form method="POST" action="{{ url_for('delete_review', id=review['review_id']) }}" onsubmit="return confirm('Are you sure you want to delete this review?')">
+        <form method="POST" action="{{ url_for('delete_review', review_id=review['review_id']) }}" onsubmit="return confirm('Are you sure you want to delete this review?')">
             <button type="submit">Delete Review</button>
         </form>
     {% endif %}
@@ -72,13 +72,13 @@
         {% for comment in comments %}
             <div class="comment-card">
                 <div class="comment-left">
-                    <a href="{{ url_for('user', id=comment['user_id']) }}">
+                    <a href="{{ url_for('user', user_id=comment['user_id']) }}">
                         <img class="comment-profile-picture" src="{{ url_for('static', filename='images/' + comment['profile_picture']) }}" alt="{{ comment['username'] }}{% if comment['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
                     </a>    
                 </div>
                 <div class="comment-right">
                     <p class="comment-header">
-                        <a href="{{ url_for('user', id=comment['user_id']) }}">
+                        <a href="{{ url_for('user', user_id=comment['user_id']) }}">
                             <b>{{ comment['username'] }}</b>
                         </a>
                         <em>{{ comment['comment_date'] }}</em>
@@ -87,12 +87,12 @@
                         {{ comment['comment_text'] }}
                     </p>
                     {% if current_user and current_user['user_id'] == comment['user_id'] %}
-                        <form method="POST" action="{{ url_for('delete_comment', id=comment['comment_id']) }}" onsubmit="return confirm('Are you sure you want to delete this comment?')">
+                        <form method="POST" action="{{ url_for('delete_comment', comment_id=comment['comment_id']) }}" onsubmit="return confirm('Are you sure you want to delete this comment?')">
                             <button type="submit">Delete Comment</button>
                         </form>
                     {% endif %}
                     {% if current_user %}
-                        <form method="POST" action="{{ url_for('reply_to_comment', id=comment['comment_id']) }}" autocomplete="off">
+                        <form method="POST" action="{{ url_for('reply_to_comment', comment_id=comment['comment_id']) }}" autocomplete="off">
                             <textarea name="reply_text" placeholder="Reply to this comment..." required>{% if reply_comment_id is defined and reply_comment_id == comment['comment_id'] %}{{ reply_text }}{% endif %}</textarea><br>
                             <button type="submit">Reply</button>
                         </form>
@@ -104,13 +104,13 @@
                         {% for reply in comment['replies'] %}
                             <div class="reply-card">
                                 <div class="reply-left">
-                                    <a href="{{ url_for('user', id=reply['user_id']) }}">
+                                    <a href="{{ url_for('user', user_id=reply['user_id']) }}">
                                         <img class="reply-profile-picture" src="{{ url_for('static', filename='images/' + reply['profile_picture']) }}" alt="{{ reply['username'] }}{% if reply['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
                                     </a>
                                 </div>
                                 <div class="reply-right">
                                     <p class="reply-header">
-                                        <a href="{{ url_for('user', id=reply['user_id']) }}">
+                                        <a href="{{ url_for('user', user_id=reply['user_id']) }}">
                                             <b>{{ reply['username'] }}</b>
                                         </a>
                                         <em>{{ reply['reply_date'] }}</em>
@@ -119,7 +119,7 @@
                                         {{ reply['reply_text'] }}
                                     </p>
                                     {% if current_user and current_user['user_id'] == reply['user_id'] %}
-                                        <form method="POST" action="{{ url_for('delete_reply', id=reply['reply_id']) }}" onsubmit="return confirm('Are you sure you want to delete this reply?')">
+                                        <form method="POST" action="{{ url_for('delete_reply', reply_id=reply['reply_id']) }}" onsubmit="return confirm('Are you sure you want to delete this reply?')">
                                             <button type="submit">Delete Reply</button>
                                         </form>
                                     {% endif %}

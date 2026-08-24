@@ -13,7 +13,7 @@
 <div class="index-container">
     <h1 class="index-header">Popular Albums</h1>
     {% for album in albums[:6] %}
-        <a href="{{ url_for('album',id=album['album_id']) }}">
+        <a href="{{ url_for('album', album_id=album['album_id']) }}">
             <!-- Album name then album cover -->
             <div class="index-card">
                 <div class="index-card-container">
