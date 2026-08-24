@@ -3,21 +3,30 @@ A site that allows users to review albums, comment on reviews, and reply to comm
 Created by Fibitius Chan"""
 
 
-# Import important models
+# Internal imports
+import sqlite3
+import os
+import secrets
+
+
+# External imports
 from flask import Flask, render_template, request, redirect, url_for, session, g, abort
 from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
-import sqlite3
-import os
-# Create app instance and secret key
+from dotenv import load_dotenv
+
+
+# Create app instance and randomized secret key in hexcode
 app = Flask(__name__)
-app.secret_key = 'onrepeatsecretkey'
+load_dotenv()
+secret_key = os.getenv('SECRET_KEY', secrets.token_hex(32))
 
 
+# Set variables for the database, allowed profile picture extensions, and the app's secret key
 DATABASE = 'onrepeat.db'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
-
+app.config['SECRET_KEY'] = secret_key
 
 # Open and read bannedwords.txt and badpasswords.txt
 with open('bannedwords.txt', 'r') as f:
@@ -58,6 +67,7 @@ def query_db(query, args=(), one=False):
 # Route for register (account creation) page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    registersql = """INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)"""
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -78,7 +88,7 @@ def register():
         existing = query_db("SELECT * FROM User WHERE LOWER(username) = LOWER(?)", (username,), one=True)
         if existing:
             return render_template("register.html", username=username, error="Username already taken!")
-        db.execute('INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)', (username, hashed_password, date.today().strftime('%d/%m/%Y')))
+        db.execute(registersql, (username, hashed_password, date.today().strftime('%d/%m/%Y')))
         db.commit()
         return redirect(url_for('login'))
     return render_template("register.html")
@@ -108,16 +118,16 @@ def logout():
     return redirect(url_for('home'))
 
 
-# Error 404 handler
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template("404.html"), 404
-
-
-# Error 403 handler
+# Error 403 handler custom page
 @app.errorhandler(403)
 def forbidden(e):
     return render_template("403.html"), 403
+
+
+# Error 404 handler custom page
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
 
 
 # Make the data of the current logged in user available to all templates
@@ -171,6 +181,7 @@ def review(id):
     average = query_db(averagerating, (id,), one=True)
     average_rating = average['average_rating']
     album = query_db(sql,(id,), True)
+    reviewsql = """INSERT INTO Review (user_id, album_id, rating, review_text, review_date) VALUES (?, ?, ?, ?, ?)'"""
     if album is None:
         abort(404)
     if average_rating is not None:
@@ -181,12 +192,17 @@ def review(id):
         rating = float(request.form['rating'])
         review_text = request.form['review_text']
         if any(word in review_text.lower() for word in BANNED_WORDS):
-            return render_template("reviewer.html", album=album, average_rating=average_rating, rating=rating, review_text=review_text, error="Your review contains words that are not allowed!")
+            return render_template("reviewer.html",
+                                   album=album,
+                                   average_rating=average_rating,
+                                   rating=rating,
+                                   review_text=review_text,
+                                   error="Your review contains words that are not allowed!")
         if rating < 0.1 or rating > 10:
             return render_template("reviewer.html", album=album, error="Rating must be between 0.1 and 10.0!")
         db = get_db()
         try:
-            db.execute('INSERT INTO Review (user_id, album_id, rating, review_text, review_date) VALUES (?, ?, ?, ?, ?)', (session['user_id'], id, rating, review_text, date.today().strftime('%d/%m/%Y')))
+            db.execute(reviewsql, (session['user_id'], id, rating, review_text, date.today().strftime('%d/%m/%Y')))
             db.commit()
             return redirect(url_for('reviews', id=id))
         except sqlite3.IntegrityError:
@@ -221,7 +237,14 @@ def all_reviews():
 # Route to read the reviews for one album
 @app.route('/album/<int:id>/reviews')
 def reviews(id):
-    sql = """SELECT Review.*, User.username, User.profile_picture FROM Review JOIN User ON Review.user_id = User.user_id WHERE album_id = ? ORDER BY review_id DESC;"""
+    sql = """SELECT Review.*,
+                User.username,
+                User.profile_picture
+             FROM Review
+             JOIN User
+             ON Review.user_id = User.user_id
+             WHERE album_id = ?
+             ORDER BY review_id DESC;"""
     albumsql = """SELECT * FROM Album WHERE album_id = ?;"""
     album = query_db(albumsql,(id,), True)
     reviews = query_db(sql,(id,))
@@ -234,9 +257,36 @@ def reviews(id):
 @app.route("/review/<int:id>", methods=['GET', 'POST'])
 def review_page(id):
     # Only one review from its ID
-    sql = """SELECT Review.*, User.username, User.profile_picture, Album.album_title, Album.album_cover, Artist.artist_id, Artist.artist_name FROM review JOIN User ON Review.user_id = User.user_id JOIN Album ON Review.album_id = Album.album_id JOIN Artist ON Album.artist_id = Artist.artist_id WHERE review_id = ?;"""
-    commentsql = """SELECT Comment.*, User.username, User.profile_picture FROM Comment JOIN User ON Comment.user_id = User.user_id WHERE review_id = ? ORDER BY comment_id DESC;"""
-    replysql = """SELECT Reply.*, User.username, User.profile_picture FROM Reply JOIN User ON Reply.user_id = User.user_id WHERE comment_id = ? ORDER BY reply_id ASC;"""
+    sql = """SELECT
+                Review.*,
+                User.username,
+                User.profile_picture,
+                Album.album_title,
+                Album.album_cover,
+                Artist.artist_id,
+                Artist.artist_name
+            FROM review
+            JOIN User
+            ON Review.user_id = User.user_id
+            JOIN Album ON Review.album_id = Album.album_id
+            JOIN Artist ON Album.artist_id = Artist.artist_id
+            WHERE review_id = ?;"""
+    commentsql = """SELECT
+                        Comment.*,
+                        User.username,
+                        User.profile_picture
+                    FROM Comment
+                    JOIN User ON Comment.user_id = User.user_id
+                    WHERE review_id = ?
+                    ORDER BY comment_id DESC;"""
+    replysql = """SELECT
+                    Reply.*,
+                    User.username,
+                    User.profile_picture
+                FROM Reply
+                JOIN User ON Reply.user_id = User.user_id
+                WHERE comment_id = ?
+                ORDER BY reply_id ASC;"""
     review = query_db(sql,(id,), True)
     if review is None:
         abort(404)
