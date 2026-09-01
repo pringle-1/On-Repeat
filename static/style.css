@@ -9,11 +9,22 @@
     --lighter-purple: #7843CF;
     --border-purple: #9064DF;
     --dark-gray: #2A2A2A;
+
+    --light-gray: #E0E0E0;
+    --white: #FFFFFF;
+    --black: #000000;
+
+    --content-width: 68rem;
+    --standard-radius: 20px;
+    --large-radius: 35px;
+    --transition: 0.2s ease;
 }
 /* Global Body: colours, positions, margins, etc.  */
 body {
     font-family: 'Be Vietnam Pro', sans-serif;
     margin: 0;
+    color: var(--dark-gray);
+    background-color: var(--white);
 }
 body::-webkit-scrollbar {
     display: none;
@@ -47,7 +58,7 @@ header {
     padding: 0;
 }
 .navbar a:hover {
-    box-shadow: inset 0 -5px 0 white;
+    box-shadow: inset 0 -4px 0 var(--white);
 }
 .navbar a.active {
     background-color: var(--darker-blue);
@@ -56,10 +67,13 @@ header {
     background-color: var(--border-purple);
 }
 .navbar .navlinks a {
-    color: white;
+    color: var(--white);
     text-decoration: none;
     font-size: 25px;
-    padding-bottom: 8px;
+    padding: 0.4rem 0.6rem 0.6rem;
+    border-radius: 8px 8px 0 0;
+    transition: background-color var(--transition),
+                box-shadow var(--transition);
 }
 .navbar .navlinks li {
     display: flex;
@@ -68,10 +82,14 @@ header {
 .profile-button {
     display: block;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    border: 5px solid var(--darker-blue);
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--darker-blue);
     object-fit: cover;
+    transition: transform var(--transition);
+}
+.profile-button:hover {
+    transform: scale(1.08);
 }
 footer {
     position: absolute;
@@ -129,14 +147,53 @@ footer {
     border-radius: 35px;
     overflow: hidden;
 }
+
+/* Global Styling */
+* {
+    box-sizing: border-box;
+}
+img {
+    max-width: 100%;
+    transition: transform var(--transition), opacity var(--transition);
+}
+a {
+    color: var(--primary-blue);
+    transition: color var(--transition), opacity var(--transition)
+}
+a:hover {
+    opacity: 0.8;
+}
+button, input, textarea {
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+button {
+    cursor: pointer;
+    transition: background-color var(--transition),
+                color var(--transition),
+                transform var(--transition),
+                box-shadow var(--transition);
+}
+button:hover {
+    transform: translateY(-2px);
+}
+button:active {
+    transform: translateY(0);
+}
 textarea {
     resize: none;
 }
-
-/* Global Styling */
-img {
-    max-width: 100%;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+.comment-right,
+.reply-right,
+.review-right,
+.profile-right,
+.profile-reviews-right,
+.artist-details {
+    min-width: 0;
+}
+.comment-text,
+.reply-text,
+.bio {
+    overflow-wrap: anywhere;
 }
 
 /* Authentication Styling (login and register pages) */
@@ -150,10 +207,11 @@ img {
 .auth-card {
     text-align: center;
     padding: 3rem 2.5rem;
-    color: white;
-    border: 8px solid black;
-    border-radius: 10px;
+    color: var(--white);
+    border: 5px solid var(--black);
+    border-radius: var(--large-radius);
     background-color: var(--lighter-purple);
+    box-shadow: 0 8px 0 var(--darker-blue);
 }
 .auth-title {
     font-size: 4.27rem;
@@ -183,6 +241,8 @@ img {
 }
 .auth-input:focus {
     outline: none;
+    border-color: var(--white);
+    box-shadow: 0 0 0 3px rgba(144, 100, 223, 0.35);
 }
 .show-password {
     display: none;
@@ -218,10 +278,27 @@ img {
     cursor: pointer;
 }
 .auth-button:hover {
-    background-color: #E0E0E0;
+    background-color: var(--light-gray);
+    box-shadow: 0 4px 0 var(--darker-blue);
 }
 .auth-card-link {
     color: var(--primary-purple);
+}
+/* General Button Styling */
+button {
+    color: var(--white);
+    background-color: var(--primary-blue);
+    border: 3px solid var(--black);
+    border-radius: 35px;
+    padding: 0.55rem 1.1rem;
+    font-size: 1rem;
+}
+button:hover {
+    background-color: var(--lighter-purple);
+}
+button:focus-visible {
+    outline: 3px solid var(--lighter-purple);
+    outline-offset: 3px;
 }
 
 /* Error Page Styling */
@@ -322,31 +399,34 @@ img {
     justify-content: center;
 }
 .page-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
-    color: white;
+    color: var(--white);
     background-color: var(--lighter-purple);
-    width: min(68rem, 90vw);
+    width: min(var(--content-width), 90vw);
+    min-height: 5rem;
     box-sizing: border-box;
-    height: 5rem;
     font-size: 3.4rem;
-    border: 5px solid black;
-    border-radius: 20px;
-    margin-top: 0.3rem;
+    border: 5px solid var(--black);
+    margin: 0.8rem 0 1.5rem;
+    padding: 0.5rem 1rem;
 }
 .content-container {
     background-color: var(--primary-purple);
     text-align: center;
     justify-content: center;
     align-items: center;
-    border: 5px solid black;
+    border: 5px solid var(--black);
     border-radius: 50px;
-    width: min(68rem, 90vw);
+    width: min(var(--content-width), 90vw);
     box-sizing: border-box;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 2em;
-    margin: 0 auto;
-    margin-bottom: 3.7rem;
+    margin: 0 auto 3.7rem;
+    padding: 1.5rem;
 }
 .content-card img {
     margin-bottom: 1.5rem;
@@ -354,6 +434,9 @@ img {
     border-radius: 35px;
     overflow: hidden;
     border: 5px solid black;
+}
+.content-card img:hover {
+    transform: scale(1.03);
 }
 .content-header {
     font-size: 1.45rem;
@@ -381,8 +464,11 @@ img {
     height: 300px;
     margin-left: 3.4rem;
     object-fit: cover;
-    border: 3px solid black;
+    border: 3px solid var(--black);
     border-radius: 1.7rem;
+}
+.album-cover:hover {
+    transform: scale(1.02);
 }
 .album-info {
     display: flex;
@@ -400,12 +486,21 @@ img {
     gap: 0.85rem;
 }
 .review-buttons {
-    color: black;
+    display: inline-block;
+    color: var(--white);
+    background-color: var(--primary-blue);
     text-decoration: none;
-    padding: 0.6rem;
-    font-size: 1.45rem;
-    border: 3px solid black;
+    padding: 0.6rem 1rem;
+    font-size: 1.2rem;
+    border: 3px solid var(--black);
     border-radius: 35px;
+    transition: background-color var(--transition),
+                transform var(--transition);
+}
+.review-buttons:hover {
+    color: var(--white);
+    background-color: var(--lighter-purple);
+    transform: translateY(-2px);
 }
 .artist-image {
     width: 300px;
