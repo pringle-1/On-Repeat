@@ -10,8 +10,8 @@ import secrets
 
 
 # External imports
-from flask import Flask, render_template, request, redirect, url_for, session, g, abort
 from datetime import date
+from flask import Flask, render_template, request, redirect, url_for, session, g, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
@@ -72,22 +72,36 @@ def register():
         username = request.form['username']
         password = request.form['password']
         if len(username) < 3:
-            return render_template("register.html", username=username, error="Username must be at least 3 characters!")
+            return render_template("register.html",
+                                   username=username,
+                                   error="Username must be at least 3 characters!")
         if len(username) > 20:
-            return render_template("register.html", username=username, error="Username must be 20 characters or less!")
+            return render_template("register.html",
+                                    username=username,
+                                    error="Username must be 20 characters or less!")
         if ' ' in username:
-            return render_template("register.html", username=username, error="Username cannot contain spaces!")
+            return render_template("register.html",
+                                    username=username,
+                                    error="Username cannot contain spaces!")
         if any(word in username.casefold() for word in BANNED_WORDS):
-            return render_template("register.html", username=username, error="That username is not allowed!")
+            return render_template("register.html",
+                                    username=username,
+                                    error="That username is not allowed!")
         if len(password) < 8:
-            return render_template("register.html", username=username, error="Password must be at least 8 characters!")
+            return render_template("register.html",
+                                    username=username,
+                                    error="Password must be at least 8 characters!")
         if password in BAD_PASSWORDS:
-            return render_template("register.html", username=username, error="Weak password, choose a stronger one!")
+            return render_template("register.html",
+                                    username=username,
+                                    error="Weak password, choose a stronger one!")
         hashed_password = generate_password_hash(password)
         db = get_db()
         existing = query_db("SELECT * FROM User WHERE LOWER(username) = LOWER(?)", (username,), one=True)
         if existing:
-            return render_template("register.html", username=username, error="Username already taken!")
+            return render_template("register.html",
+                                    username=username,
+                                    error="Username already taken!")
         db.execute(register_sql, (username, hashed_password, date.today().strftime('%d/%m/%Y')))
         db.commit()
         return redirect(url_for('login'))
@@ -100,7 +114,8 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = query_db('SELECT * FROM user WHERE LOWER(username) = LOWER(?)', (username,), one=True)
+        user_sql = """SELECT * FROM User WHERE LOWER(username) = LOWER(?)"""
+        user = query_db(user_sql, (username,), one=True)
         if user is None:
             return render_template("login.html", username=username, error="User not found!")
         if not check_password_hash(user['password'], password):
@@ -206,8 +221,13 @@ def review(album_id):
             db.commit()
             return redirect(url_for('reviews', album_id=album_id))
         except sqlite3.IntegrityError:
-            return render_template("reviewer.html", album=album, error="You have already reviewed this album!")
-    return render_template("reviewer.html", album=album, average_rating=average_rating, review=review)
+            return render_template("reviewer.html",
+                                    album=album,
+                                    average_rating=average_rating,
+                                    rating=rating,
+                                    review_text=review_text,
+                                    error="You have already reviewed this album!")
+    return render_template("reviewer.html", album=album, average_rating=average_rating)
 
 
 # Route for all reviews page
@@ -302,7 +322,11 @@ def review_page(review_id):
             return redirect(url_for('login'))
         comment_text = request.form['comment_text']
         if any(word in comment_text.lower() for word in BANNED_WORDS):
-            return render_template("review.html", review=review, comments=comments, comment_text=comment_text, comment_error="Your comment contains words that are not allowed!")
+            return render_template("review.html",
+                                review=review,
+                                comments=comments,
+                                comment_text=comment_text,
+                                comment_error="Your comment contains words that are not allowed!")
         db = get_db()
         db.execute('INSERT INTO COMMENT (user_id, review_id, comment_text, comment_date) VALUES (?, ?, ?, ?)', (session['user_id'], review_id, comment_text, date.today().strftime('%d/%m/%Y')))
         db.commit()
@@ -317,12 +341,22 @@ def reply_to_comment(comment_id):
         return redirect(url_for('login'))
     comment_sql = """SELECT * FROM Comment WHERE comment_id = ?"""
     comment = query_db(comment_sql, (comment_id,), one=True)
-    reply_sql = """INSERT INTO Reply (user_id, comment_id, reply_text, reply_date) VALUES (?, ?, ?, ?)"""
+    reply_sql = """INSERT INTO Reply (user_id,
+                                      comment_id,
+                                      reply_text,
+                                      reply_date)
+                   VALUES (?, ?, ?, ?)"""
     if comment is None:
         abort(404)
     reply_text = request.form['reply_text']
     if any(word in reply_text.lower() for word in BANNED_WORDS):
-        review_sql = """SELECT Review.*, User.username, User.profile_picture, Album.album_title, Album.album_cover, Artist.artist_id, Artist.artist_name
+        review_sql = """SELECT Review.*,
+                               User.username,
+                               User.profile_picture,
+                               Album.album_title,
+                               Album.album_cover,
+                               Artist.artist_id,
+                               Artist.artist_name
                  FROM Review
                  JOIN User ON Review.user_id = User.user_id
                  JOIN Album ON Review.album_id = Album.album_id
@@ -387,8 +421,18 @@ def edit_review(review_id):
     if request.method == 'POST':
         rating = float(request.form['rating'])
         review_text = request.form['review_text']
+        if any(word in review_text.lower() for word in BANNED_WORDS):
+            return render_template("edit_review.html",
+                                review=review,
+                                average_rating=average_rating,
+                                review_text=review_text,
+                                rating=rating,
+                                error="Your edited review contains words that are not allowed!")
         if rating < 0.1 or rating > 10.0:
-            return render_template("edit_review.html", review=review, average_rating=average_rating, error="Rating must be between 0.1 and 10.0!")
+            return render_template("edit_review.html",
+                                   review=review,
+                                   average_rating=average_rating,
+                                   error="Rating must be between 0.1 and 10.0!")
         db = get_db()
         db.execute(edit_sql, (rating, review_text, review_id))
         db.commit()
@@ -404,12 +448,18 @@ def delete_review(review_id):
     review_sql = """SELECT * FROM Review WHERE review_id = ?"""
     review = query_db(review_sql, (review_id,),True)
     delete_sql = """DELETE FROM Review WHERE review_id = ?"""
+    reply_delete_sql = """DELETE FROM Reply
+                          WHERE comment_id
+                          IN (SELECT comment_id
+                              FROM Comment
+                              WHERE review_id = ?)"""
     comment_delete_sql = """DELETE FROM Comment WHERE review_id = ?"""
     if review is None:
         abort(404)
     if review['user_id'] != session['user_id']:
         abort(403)
     db = get_db()
+    db.execute(reply_delete_sql, (review_id,))
     db.execute(comment_delete_sql, (review_id,))
     db.execute(delete_sql, (review_id,))
     db.commit()
@@ -483,7 +533,13 @@ def artist(artist_id):
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    sql = """SELECT Review.*, Album.album_title, Album.album_cover FROM Review JOIN Album ON Review.album_id = Album.album_id WHERE Review.user_id = ? ORDER BY Review.review_date DESC"""
+    sql = """SELECT Review.*,
+                    Album.album_title,
+                    Album.album_cover
+             FROM Review
+             JOIN Album ON Review.album_id = Album.album_id
+             WHERE Review.user_id = ?
+             ORDER BY Review.review_date DESC"""
     reviews = query_db(sql, (session['user_id'],))
     return render_template("profile.html", active_page="profile", reviews=reviews)
 
@@ -495,8 +551,17 @@ def edit_profile():
         return redirect(url_for('login'))
     user_sql = """SELECT * FROM User WHERE user_id = ?"""
     user = query_db(user_sql, (session['user_id'],), one=True)
-    edit_sql = """UPDATE User SET username = ?, user_bio = ?, profile_picture = ? WHERE user_id = ?"""
-    edit_password_sql = """UPDATE User SET username = ?, user_bio = ?, password = ?, profile_picture = ? WHERE user_id = ?"""
+    edit_sql = """UPDATE User
+                  SET username = ?,
+                      user_bio = ?,
+                      profile_picture = ?
+                  WHERE user_id = ?"""
+    edit_password_sql = """UPDATE User
+                           SET username = ?,
+                               user_bio = ?,
+                               password = ?,
+                               profile_picture = ?
+                           WHERE user_id = ?"""
     if user is None:
         abort(404)
     if request.method == 'POST':
@@ -507,34 +572,84 @@ def edit_profile():
         profile_picture = request.files['profile_picture']
         profile_filename = user['profile_picture']
         if any(word in bio.lower() for word in BANNED_WORDS):
-            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Your bio contains words that are not allowed!")
+            return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Your bio contains words that are not allowed!")
         if len(username) < 3:
-            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username must be at least 3 characters!")
+            return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Username must be at least 3 characters!")
         if len(username) > 20:
-            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username must be 20 characters or less!")
+            return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Username must be 20 characters or less!")
         if ' ' in username:
-            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username cannot contain spaces!")
+            return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Username cannot contain spaces!")
         if any(word in username.lower() for word in BANNED_WORDS):
-            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="That username is not allowed!")
-        takenusernamesql = """SELECT * FROM User WHERE LOWER(username) = LOWER(?) AND user_id != ?"""
+            return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="That username is not allowed!")
+        takenusernamesql = """SELECT *
+                              FROM User
+                              WHERE LOWER(username) = LOWER(?)
+                              AND user_id != ?"""
         takenusername = query_db(takenusernamesql, (username, session['user_id']), one=True)
         if takenusername:
-            return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Username already taken!")
+            return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Username already taken!")
         if current_password or new_password:
             if not current_password or not new_password:
-                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Enter both your current and new password!")
+                return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Enter both your current and new password!")
             if not check_password_hash(user['password'], current_password):
-                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Current password is incorrect!")
+                return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Current password is incorrect!")
             if new_password == current_password:
-                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Your new password cannot be the same as your current password!")
+                return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Your new password cannot be the same as your current password!")
             if len(new_password) < 8:
-                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="New password must be at least 8 characters!")
+                return render_template("edit_profile.html",
+                                        user=user,
+                                        username=username,
+                                        bio=bio,
+                                        error="New password must be at least 8 characters!")
             if new_password in BAD_PASSWORDS:
-                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Weak password, choose a stronger one!")
+                return render_template("edit_profile.html",
+                                        user=user,
+                                        username=username,
+                                        bio=bio, error="Weak password, choose a stronger one!")
             hashed_password = generate_password_hash(new_password)
         if profile_picture and profile_picture.filename:
             if not allowed_file(profile_picture.filename):
-                return render_template("edit_profile.html", user=user, username=username, bio=bio, error="Profile picture must be a PNG, JPG, JPEG, GIF, or WEBP file!")
+                return render_template("edit_profile.html",
+                            user=user,
+                            username=username,
+                            bio=bio,
+                            error="Profile picture must be a PNG, JPG, JPEG, GIF, or WEBP file!")
             filename = secure_filename(profile_picture.filename)
             extension = filename.rsplit('.', 1)[1].lower()
             new_filename = f"profile_{session['user_id']}.{extension}"
@@ -548,7 +663,11 @@ def edit_profile():
             profile_filename = new_filename
         db = get_db()
         if current_password or new_password:
-            db.execute(edit_password_sql, (username, bio, hashed_password, profile_filename, session['user_id']))
+            db.execute(edit_password_sql, (username,
+                                           bio,
+                                           hashed_password,
+                                           profile_filename,
+                                           session['user_id']))
         else:
             db.execute(edit_sql, (username, bio, profile_filename, session['user_id']))
         db.commit()
@@ -600,4 +719,3 @@ def user(user_id):
 # Run statement
 if __name__ == "__main__":
     app.run(debug=True)
-
