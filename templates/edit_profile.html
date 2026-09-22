@@ -13,27 +13,32 @@
                 <img class="profile-picture" src="{{ url_for('static', filename='images/' + current_user['profile_picture'])}}" alt="{{ current_user['username'] }}{% if current_user['username'].endswith('s') %}'{% else %}'s{% endif %} profile picture">
             </div>
             <div class="profile-right">
-                <form method="POST" enctype="multipart/form-data" autocomplete="off">
+                <form id="profile-edit-form" method="POST" enctype="multipart/form-data" autocomplete="off">
                     {% if error %}
                         <p class="error">{{ error }}</p>
                     {% endif %}
                     <label for="username">Username</label><br>
                     <input type="text" id="username" name="username" value="{{ username if username is defined else user['username'] }}" required><br><br>
                     <label for="bio">Bio</label><br>
-                    <textarea id="bio" name="bio" rows="6" cols="45">{{ bio if bio is defined else user['user_bio'] or '' }}</textarea><br>
+                    <textarea id="bio" name="bio" rows="6">{{ bio if bio is defined else user['user_bio'] or '' }}</textarea><br>
                     <label for="profile_picture">Profile Picture</label><br>
                     <input type="file" id="profile_picture" name="profile_picture" accept="image/*"><br><br>
                     <label for="current_password">Current Password</label><br>
                     <input type="password" id="current_password" name="current_password" placeholder="Current Password"><br><br>
                     <label for="new_password">New Password</label><br>
                     <input type="password" id="new_password" name="new_password" placeholder="New Password"><br><br>
-                <button type="submit">Save Changes</button>
                 </form>
-                {% if user['profile_picture'] != 'profile_placeholder.png' %}
-                    <form method="POST" action="{{ url_for('clear_profile_picture') }}" onsubmit="return confirm('Are you sure you want to remove your profile picture? This will return your profile picture to the placeholder image.')">
-                        <button type="submit">Clear Profile Picture</button>
-                    </form>
-                {% endif %}
+                <div class="profile-actions">
+                    <button type="submit" form="profile-edit-form">Save Changes</button>
+                    {% if user['profile_picture'] != 'profile_placeholder.png' %}
+                        <form method="POST"
+                            class="delete-form"
+                            action="{{ url_for('clear_profile_picture') }}"
+                            onsubmit="return confirm('Are you sure you want to remove your profile picture? This will return your profile picture to the placeholder image.')">
+                            <button type="submit">Clear Profile Picture</button>
+                        </form>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

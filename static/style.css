@@ -92,18 +92,19 @@ header {
     transform: scale(1.08);
 }
 footer {
-    position: absolute;
     width: 100%;
     font-size: 1.7rem;
     background-color: var(--darker-blue);
-    color: white;
+    color: var(--white);
     text-align: center;
     min-height: 11.2rem;
+    margin-top: 3rem;
 }
 .copyright {
     display: flex;
-    margin-left: 8.5rem;
-    margin-top: 4.5rem;
+    justify-content: center;
+    margin: 0;
+    padding-top: 4.5rem;
 }
 
 /* Index Styling (home page) */
@@ -165,6 +166,25 @@ a:hover {
 }
 button, input, textarea {
     font-family: 'Be Vietnam Pro', sans-serif;
+}
+input[type="file"] {
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+input[type="file"]::file-selector-button {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    color: var(--white);
+    background-color: var(--primary-blue);
+    border: 3px solid var(--black);
+    border-radius: 35px;
+    padding: 0.5rem 1rem;
+    margin-right: 0.8rem;
+    cursor: pointer;
+    transition: background-color var(--transition),
+                transform var(--transition);
+}
+input[type="file"]::file-selector-button:hover {
+    background-color: var(--lighter-purple);
+    transform: translateY(-2px);
 }
 button {
     cursor: pointer;
@@ -251,17 +271,19 @@ textarea {
     top: 50%;
     transform: translateY(-50%);
     user-select: none;
-    color: white;
+    color: var(--white);
     border: none;
     background: none;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 .input-icon {
     position: absolute;
-    max-width: 1.7rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    object-fit: contain;
     transform: translateY(-50%);
-    right: 0.4rem;
+    right: 0.7rem;
     top: 50%;
 }
 .auth-button {
@@ -284,6 +306,21 @@ textarea {
 .auth-card-link {
     color: var(--primary-purple);
 }
+/* General Form Styling */
+input:not(.auth-input), textarea {
+    border: 3px solid var(--border-purple);
+    border-radius: 12px;
+    padding: 0.6rem;
+    background-color: var(--white);
+    color: var(--dark-gray);
+    transition: border-color var(--transition),
+                box-shadow var(--transition);
+}
+input:not(.auth-input):focus, textarea:focus {
+    outline: none;
+    border-color: var(--lighter-purple);
+    box-shadow: 0 0 0 3px rgba(120, 67, 207, 0.2);
+}
 /* General Button Styling */
 button {
     color: var(--white);
@@ -299,6 +336,12 @@ button:hover {
 button:focus-visible {
     outline: 3px solid var(--lighter-purple);
     outline-offset: 3px;
+}
+.delete-form button {
+    background-color: #B3261E;
+}
+.delete-form button:hover {
+    background-color: #8C1D18;
 }
 
 /* Error Page Styling */
@@ -353,6 +396,14 @@ button:focus-visible {
     flex: 1;
     min-width: 0;
 }
+.profile-right > form {
+    width: 100%;
+}
+.profile-right input,
+.profile-right textarea {
+    width: 100%;
+    max-width: 100%;
+}
 .profile-info {
     display: flex;
     gap: 2.5rem;
@@ -391,6 +442,15 @@ button:focus-visible {
 }
 .profile-reviews-right h3 {
     margin-top: 0;
+}
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+}
+.profile-actions .delete-form {
+    width: auto;
 }
 
 /* Content Styling (albums page and artists page) */
@@ -462,7 +522,7 @@ button:focus-visible {
 .album-cover {
     width: 300px;
     height: 300px;
-    margin-left: 3.4rem;
+    margin-left: 0;
     object-fit: cover;
     border: 3px solid var(--black);
     border-radius: 1.7rem;
@@ -475,9 +535,26 @@ button:focus-visible {
     gap: 2.5rem;
     align-items: flex-start;
     text-align: left;
+    padding: 0 2rem 2rem;
+}
+.album-left {
+    width: 300px;
+    flex-shrink: 0;
+}
+.album-right {
+    flex: 1;
+    min-width: 0;
+}
+.album-right form {
+    width: 100%;
 }
 .album-about {
-    width: 24.8rem;
+    width: 100%;
+}
+.album-right input,
+.album-right textarea {
+    width: 100%;
+    max-width: 100%;
 }
 .review-buttons-container {
     display: flex;
@@ -501,6 +578,7 @@ button:focus-visible {
     color: var(--white);
     background-color: var(--lighter-purple);
     transform: translateY(-2px);
+    opacity: 1;
 }
 .artist-image {
     width: 300px;
@@ -550,10 +628,26 @@ button:focus-visible {
 .reviews-card {
     display: flex;
     gap: 2rem;
-    width: 64rem;
+    width: min(64rem, 90vw);
     padding: 2rem;
-    border: 5px solid black;
-    border-radius: 35px;
+    background-color: var(--white);
+    border: 5px solid var(--black);
+    border-radius: var(--large-radius);
+    box-shadow: 0 5px 0 var(--primary-purple);
+    transition: transform var(--transition),
+                box-shadow var(--transition);
+}
+.reviews-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 0 var(--primary-purple);
+}
+.review-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+.review-link:hover {
+    opacity: 1;
 }
 .review-left {
     width: 100px;
@@ -576,15 +670,50 @@ button:focus-visible {
 }
 
 /* Comment Styling */
+.edit-button {
+    display: inline-block;
+    color: var(--white);
+    background-color: var(--primary-blue);
+    text-decoration: none;
+    border: 3px solid var(--black);
+    border-radius: 35px;
+    padding: 0.55rem 1rem;
+    transition: background-color var(--transition),
+                transform var(--transition);
+}
+.edit-button:hover {
+    color: var(--white);
+    background-color: var(--lighter-purple);
+    transform: translateY(-2px);
+    opacity: 1;
+}
+.comments-header {
+
+}
+.comment-form {
+    width: min(69rem, 90vw);
+}
+.comment-form textarea {
+    width: 100%;
+    max-width: 100%;
+    min-height: 7rem;
+}
+.comment-form button {
+    margin-top: 0.5rem;
+}
 .comment-card {
     display: flex;
     gap: 1.5rem;
-    width: 69rem;
+    width: min(69rem, 90vw);
     box-sizing: border-box;
     padding: 1.5rem;
-    border: 3px solid black;
-    border-radius: 20px;
+    background-color: var(--white);
+    border: 3px solid var(--black);
+    border-radius: var(--standard-radius);
     text-align: left;
+}
+.comment-card, .reply-card {
+    overflow: hidden;
 }
 .comment-left {
     width: 70px;
@@ -601,6 +730,19 @@ button:focus-visible {
 .comment-right {
     flex: 1;
 }
+.comment-right button,
+.reply-right button {
+    background-color: var(--primary-blue);
+}
+.comment-right form,
+.reply-right form {
+    margin-top: 0.7rem;
+    padding: 0.4rem 0.8rem;
+}
+.comment-text,
+.reply-text {
+    margin-bottom: 0.5rem;
+}
 .comment-header em {
     margin-left: 0.8rem;
     font-size: 1rem;
@@ -612,21 +754,25 @@ button:focus-visible {
 /* Reply Styling */
 .reply-card {
     display: flex;
+    width: calc(100% - 2rem);
+    max-width: 100%;
     margin-top: 1rem;
     margin-left: 2rem;
     padding: 0.5rem 0.8rem;
     gap: 0.8rem;
-    border-left: 3px solid black;
+    border-left: 3px solid var(--black);
+    overflow: hidden;
 }
 .reply-left {
     width: 50px;
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
 }
 .reply-profile-picture {
     width: 45px;
     height: 45px;
-    border: 2px solid black;
+    border: 2px solid var(--black);
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
@@ -634,6 +780,13 @@ button:focus-visible {
 .reply-right {
     flex: 1;
     min-width: 0;
+}
+.reply-right form {
+    width: 100%;
+}
+.reply-right textarea {
+    width: 100%;
+    max-width: 100%;
 }
 .reply-header {
     margin-top: 0;
@@ -645,4 +798,66 @@ button:focus-visible {
 }
 .reply-text {
     margin-top: 0;
+}
+/* Styling for responsiveness */
+@media (max-width: 900px) {
+    .navbar .navlinks {
+        gap: 1rem;
+    }
+    .navbar .navlinks a {
+        font-size: 1.1rem;
+    }
+    .content-container {
+        grid-template-columns: 1fr 1fr;
+    }
+    .reviews-card,
+    .profile-card {
+        width: min(90vw, 51.2rem);
+    }
+}
+@media (max-width: 650px) {
+    header {
+        padding: 0.5rem 1rem;
+    }
+    .logo {
+        max-width: 9rem;
+    }
+    .navbar .navlinks {
+        gap: 0.4rem;
+    }
+    .navbar .navlinks a {
+        font-size: 0.9rem;
+        padding: 0.3rem;
+    }
+    .content-container {
+        grid-template-columns: 1fr;
+    }
+    .album-info,
+    .profile-info,
+    .reviews-card {
+        flex-direction: column;
+        align-items: center;
+    }
+    .album-cover {
+        margin-left: 0;
+    }
+    .album-about,
+    .review-right,
+    .profile-right {
+        width: 100%;
+    }
+    .comment-card {
+        width: 90vw;
+    }
+    .reply-card {
+        margin-left: 1rem;
+        width: calc(100% - 1rem);
+    }
+    .page-header {
+        font-size: 2.2rem;
+    }
+    .index-header,
+    .discography {
+        font-size: 2.5rem;
+    }
 }
