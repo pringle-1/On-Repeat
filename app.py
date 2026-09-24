@@ -68,17 +68,21 @@ with open('badpasswords.txt', 'r') as f:
 
 # Database functionality
 
-# Create the database connection function
+# Create or reuse the database connection for requests
 def get_db():
+    # Check if a database connection has already been established
     if 'db' not in g:
+        # Create a connection to the database file
         g.db = sqlite3.connect(DATABASE)
+        # Allow access to database rows using column names
         g.db.row_factory = sqlite3.Row
     return g.db
 
 
 # Check that uploaded profile picture files have an allowed file extension
 def allowed_file(filename):
-    # A valid filename contains a dot and have an extension in ALLOWED_EXTENSIONS
+    # Ensure that the filename contains an extension (a dot)
+    # which is in ALLOWED_EXTENSIONS
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
@@ -109,7 +113,7 @@ def register():
     register_sql = """INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)"""
     # Process if the user submits it
     if request.method == 'POST':
-        # Get the user inputted values from the form
+        #  the user inputted values from the form
         username = request.form['username']
         password = request.form['password']
         # Ensure the username is long enough
@@ -122,7 +126,7 @@ def register():
             return render_template("register.html",
                                     username=username,
                                     error="Username must be 20 characters or less!")
-        # Ensure the username doesn't contain a space
+        # Ensure the username doesn't contain spaces
         if ' ' in username:
             return render_template("register.html",
                                     username=username,
@@ -168,7 +172,7 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Get the values entered into the form by the user
+        # Retrieve the values entered into the form by the user
         username = request.form['username']
         password = request.form['password']
         user_sql = """SELECT * FROM User WHERE LOWER(username) = LOWER(?)"""
@@ -247,20 +251,23 @@ def albums():
     return render_template("albums.html", active_page="albums", albums=albums)
 
 
-# Route for an individiual album page
+# Route for an individual album page
 @app.route('/album/<int:album_id>')
 def album(album_id):
     # Retrieve the album and its artists using SQL JOIN
-    sql = """SELECT * FROM album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
+    sql = """SELECT *
+             FROM album
+             JOIN Artist ON Album.artist_id = Artist.artist_id
+             WHERE album_id = ?;"""
     # Calculate the average rating for the selected album
     average_rating_sql = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?;"""
     # Retrieve album information and its average rating
     album = query_db(sql, (album_id,), True)
-    average = query_db(average_rating_sql, (album_id,), one=True)
-    average_rating = average['average_rating']
     # Display the custom error 404 handler page if the album doesn't exist
     if album is None:
         abort(404)
+    average = query_db(average_rating_sql, (album_id,), one=True)
+    average_rating = average['average_rating']
     # Round the average rating to one decimal place
     if average_rating is not None:
         average_rating = round(average_rating, 1)
@@ -457,7 +464,7 @@ def reply_to_comment(comment_id):
     # Prevent reply posting if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    # Retrieve the the comment being replied to and its details
+    # Retrieve the comment being replied to and its details
     comment_sql = """SELECT * FROM Comment WHERE comment_id = ?"""
     comment = query_db(comment_sql, (comment_id,), one=True)
     # SQL statement to insert a new reply into the database
@@ -608,11 +615,11 @@ def delete_review(review_id):
     if review['user_id'] != session['user_id']:
         abort(403)
     db = get_db()
-    # Delete replies first as they belong to comments
+    # Delete replies first as they depend on the comment they're under
     db.execute(reply_delete_sql, (review_id,))
-    # Delete comments next as they belong to reviews
+    # Delete comments next after their replies have been deleted
     db.execute(comment_delete_sql, (review_id,))
-    # Delete the review last
+    # Delete the review last after both their comments and replies have been deleted
     db.execute(delete_sql, (review_id,))
     db.commit()
     return redirect(url_for('reviews', album_id=review['album_id']))
@@ -662,7 +669,8 @@ def delete_reply(reply_id):
         abort(404)
     # SQL query to delete the reply
     delete_sql = """DELETE FROM Reply WHERE reply_id = ?"""
-    # Retrieve the review ID so the user can be redirected to the correct page after successful deletion
+    # Retrieve the review ID so the user can be
+    # redirected to the correct page after successful deletion
     comment_sql = """SELECT review_id FROM Comment WHERE comment_id = ?"""
     comment = query_db(comment_sql, (reply['comment_id'],), one=True)
     # Display the custom error 403 handler page if the current user ID
@@ -680,30 +688,38 @@ def delete_reply(reply_id):
 # Route for artists page
 @app.route('/artists')
 def artists():
-    # Run SQL query to get artists and all their details
+    # SQL query to get artists and all their details from the database
     sql = """SELECT * FROM artist;"""
     artists = query_db(sql)
+    # Display the all artists page
     return render_template("artists.html", active_page="artists", artists=artists)
 
 
 # Route for one artist's page
 @app.route('/artist/<int:artist_id>')
 def artist(artist_id):
-    # Only one artist from its ID
+    # SQL query to retrieve details for the selected artist
     artist_sql = """SELECT * FROM artist WHERE artist_id = ?;"""
     artist = query_db(artist_sql, (artist_id,), True)
+    # Retrieve the albums made by the selected artist
     album_sql = """SELECT * FROM Album WHERE artist_id = ?"""
+    # Display the custom error 404 handler page if the artist doesn't exist 
     if artist is None:
         abort(404)
     albums = query_db(album_sql, (artist_id,))
+    # Display the artist's page
     return render_template("artist.html", artist=artist, albums=albums)
 
+# Current user profile
 
 # Route for my profile page
 @app.route('/profile')
 def profile():
+    # The user must be logged in to view their profile
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    # SQL query to retrieve the user's review details and
+    # the covers and titles of the albums they've reviewed
     sql = """SELECT Review.*,
                     Album.album_title,
                     Album.album_cover
@@ -712,166 +728,214 @@ def profile():
              WHERE Review.user_id = ?
              ORDER BY Review.review_date DESC"""
     reviews = query_db(sql, (session['user_id'],))
+    # Display the user's profile page
     return render_template("profile.html", active_page="profile", reviews=reviews)
 
+# Edit profile
 
 # Route for editing my profile
 @app.route('/profile/edit', methods=['GET', 'POST'])
 def edit_profile():
+    # Prevent profile editing if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    # SQL query to retrieve the user's details
     user_sql = """SELECT * FROM User WHERE user_id = ?"""
     user = query_db(user_sql, (session['user_id'],), one=True)
+    # SQL query for when the user doesn't update their password
     edit_sql = """UPDATE User
                   SET username = ?,
                       user_bio = ?,
                       profile_picture = ?
                   WHERE user_id = ?"""
+    # SQL query for then the user updates their password
     edit_password_sql = """UPDATE User
                            SET username = ?,
                                user_bio = ?,
                                password = ?,
                                profile_picture = ?
                            WHERE user_id = ?"""
+    # Display the custom error 404 handler page if the user doesn't exist
     if user is None:
         abort(404)
     if request.method == 'POST':
+        # Retrieve the user inputted values from the form
         username = request.form['username']
         bio = request.form['bio']
         current_password = request.form['current_password']
         new_password = request.form['new_password']
         profile_picture = request.files['profile_picture']
+        # Keep the same profile picture if it is not updated
         profile_filename = user['profile_picture']
+        # Prevent bio updating if the new bio contains banned words
         if any(word in bio.lower() for word in BANNED_WORDS):
             return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Your bio contains words that are not allowed!")
+        # Ensure the username is long enough
         if len(username) < 3:
             return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Username must be at least 3 characters!")
+        # Ensure the username isn't too long
         if len(username) > 20:
             return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Username must be 20 characters or less!")
+        # Ensure the username doesn't contain spaces
         if ' ' in username:
             return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Username cannot contain spaces!")
+        # Prevent username updating if the new username contains banned words
         if any(word in username.lower() for word in BANNED_WORDS):
             return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="That username is not allowed!")
+        # SQL query to find accounts with the same username excluding the current user
         takenusernamesql = """SELECT *
                               FROM User
                               WHERE LOWER(username) = LOWER(?)
                               AND user_id != ?"""
         takenusername = query_db(takenusernamesql, (username, session['user_id']), one=True)
+        # Ensure the new username isn't already taken
         if takenusername:
             return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Username already taken!")
+        # Process changes if either password field is filled in
         if current_password or new_password:
+            # Ensure both passwords fields are filled in
             if not current_password or not new_password:
                 return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Enter both your current and new password!")
+            # Ensure that the current password field is correct
             if not check_password_hash(user['password'], current_password):
                 return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Current password is incorrect!")
+            # Prevent the user from reusing the same password
             if new_password == current_password:
                 return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Your new password cannot be the same as your current password!")
+            # Ensure the new password is long enough
             if len(new_password) < 8:
                 return render_template("edit_profile.html",
                                         user=user,
                                         username=username,
                                         bio=bio,
                                         error="New password must be at least 8 characters!")
+            # Prevent password updating if it matches a value in the list of bad passwords
             if new_password in BAD_PASSWORDS:
                 return render_template("edit_profile.html",
                                         user=user,
                                         username=username,
                                         bio=bio, error="Weak password, choose a stronger one!")
+            # Hash the password before storing it in the database
             hashed_password = generate_password_hash(new_password)
         if profile_picture and profile_picture.filename:
+            # Ensure that the extension of the uploaded file is allowed
             if not allowed_file(profile_picture.filename):
                 return render_template("edit_profile.html",
                             user=user,
                             username=username,
                             bio=bio,
                             error="Profile picture must be a PNG, JPG, JPEG, GIF, or WEBP file!")
+            # Create a safe version of the new filename
             filename = secure_filename(profile_picture.filename)
+            # Retrieve the file extension
             extension = filename.rsplit('.', 1)[1].lower()
+            # Create a new filename for the uploaded image for each user ID
+            # This ensures that each user has their own profile picture file
             new_filename = f"profile_{session['user_id']}.{extension}"
+            # Create the path where the profile image is stored
             filepath = os.path.join('static', 'images', new_filename)
             profile_picture.save(filepath)
+            # Retrieve the name of the old profile picture
             old_filename = user['profile_picture']
+            # Delete the old file if the previous image was uploaded by the user (not placeholder)
             if old_filename.startswith(f"profile_{session['user_id']}.") and old_filename != new_filename:
                 old_filepath = os.path.join('static', 'images', old_filename)
                 if os.path.exists(old_filepath):
                     os.remove(old_filepath)
+            # Update the filename of the profile picture
             profile_filename = new_filename
         db = get_db()
+        # If the password was changed, update the password value
         if current_password or new_password:
             db.execute(edit_password_sql, (username,
                                            bio,
                                            hashed_password,
                                            profile_filename,
                                            session['user_id']))
+        # Otherwise, only update the changed values
         else:
             db.execute(edit_sql, (username, bio, profile_filename, session['user_id']))
         db.commit()
+        # Update the username stored in the current session
         session['username'] = username
         return redirect(url_for('profile'))
     return render_template("edit_profile.html", user=user)
 
+# Clear profile picture
 
 # Route for clearing profile picture
 @app.route('/profile/edit/clear-picture', methods=['POST'])
 def clear_profile_picture():
+    # Prevent profile picture clearing if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
+    # SQL query to retrieve the filename of the user's current profile picture
     user_sql = """SELECT profile_picture FROM User WHERE user_id = ?"""
     user = query_db(user_sql, (session['user_id'],), one=True)
+    # SQL query to replace the current image with the default placeholder image
     update_sql = """UPDATE User SET profile_picture = ? WHERE user_id = ?"""
+    # Display the custom error 404 page handler if the user doesn't exist
     if user is None:
         abort(404)
+    # Retrieve the filename of the user's current profile picture
     old_filename = user['profile_picture']
+    # Only delete files that belong to the user
     if old_filename.startswith(f"profile_{session['user_id']}."):
         old_filepath = os.path.join('static', 'images', old_filename)
+        # Delete the old image file if it exists
         if os.path.exists(old_filepath):
             os.remove(old_filepath)
     db = get_db()
+    # Replace the database image value with the default placeholder image
     db.execute(update_sql, ('profile_placeholder.png', session['user_id']))
     db.commit()
+    # Return to the edit profile page
     return redirect(url_for('edit_profile'))
 
+# Other user profiles
 
 # Route for other user profiles
 @app.route('/user/<int:user_id>')
 def user(user_id):
+    # SQL query to retrieve the selected user's details
     sql = """SELECT * FROM User WHERE user_id = ?;"""
+    # SQL query to retrieve all reviews written by the selected user
     review_sql = """SELECT
                         Review.*,
                         Album.album_title,
@@ -880,13 +944,18 @@ def user(user_id):
                     JOIN Album ON Review.album_id = Album.album_id
                     WHERE Review.user_id = ?
                     ORDER BY Review.review_date DESC;"""
+    # Find the user and the user's reviews
     user = query_db(sql, (user_id,), True)
     reviews = query_db(review_sql, (user_id,))
+    # Display the custom error 404 page handler if the user doesn't exist
     if user is None:
         abort(404)
+    # Display the user's profile and the user's reviews
     return render_template("user.html", user=user, reviews=reviews)
 
+# Run application
 
 # Run statement
+# Ensures that the server only starts when the Python file is being run
 if __name__ == "__main__":
     app.run(debug=True)
