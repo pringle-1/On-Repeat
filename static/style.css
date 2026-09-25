@@ -277,6 +277,11 @@ textarea {
     cursor: pointer;
     font-size: 1rem;
 }
+.show-password:hover {
+    transform: translateY(-50%);
+    background-color: transparent;
+    box-shadow: none;
+}
 .input-icon {
     position: absolute;
     width: 1.2rem;
