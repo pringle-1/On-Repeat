@@ -65,5 +65,3 @@ static/             CSS, images and profile pictures
  ## Author
 
  **Fibitius Chan**
-
- 12DTP — On Repeat
