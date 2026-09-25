@@ -58,18 +58,18 @@ app.config['SECRET_KEY'] = secret_key
 # Open bannedwords.txt and store each banned word in a list
 # strip() removes whitespace or newlines and lower() makes it so that the words are banned
 # regardless of capitalisation
-with open('bannedwords.txt', 'r') as f:
+with open('bannedwords.txt', 'r', encoding='utf-8') as f:
     BANNED_WORDS = [line.strip().lower() for line in f]
 
 # Open badpasswords.txt and store each bad password in a list
 # Users cannot register with or update their passwords to these passwords as they are too common
-with open('badpasswords.txt', 'r') as f:
+with open('badpasswords.txt', 'r', encoding='utf-8') as f:
     BAD_PASSWORDS = [line.strip() for line in f]
 
 # Database functionality
 
-# Create or reuse the database connection for requests
 def get_db():
+    """Create or reuse the database connection"""
     # Check if a database connection has already been established
     if 'db' not in g:
         # Create a connection to the database file
@@ -79,24 +79,24 @@ def get_db():
     return g.db
 
 
-# Check that uploaded profile picture files have an allowed file extension
 def allowed_file(filename):
+    """Check whether a profile picture has an allowed extension"""
     # Ensure that the filename contains an extension (a dot)
     # which is in ALLOWED_EXTENSIONS
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# Close database connection after every request
 @app.teardown_appcontext
-def close_db(error):
+def close_db(_error):
+    """Close the database connection after a request"""
     db = g.pop('db', None)
     # Close the connection if one was opened
     if db is not None:
         db.close()
 
 
-# Function to pull data from the database with SQL queries
 def query_db(query, args=(), one=False):
+    """Function to pull data from the database with queries in SQL"""
     # Execute the query
     cur = get_db().execute(query, args)
     # Fetch all rows returned by query
@@ -106,14 +106,14 @@ def query_db(query, args=(), one=False):
 
 # Account registration
 
-# Route for register (account creation) page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """Handle account registration"""
     # SQL statement to create a new account using the user's inputted values
     register_sql = """INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?)"""
     # Process if the user submits it
     if request.method == 'POST':
-        #  the user inputted values from the form
+        # Retrieve the user inputted values from the form
         username = request.form['username']
         password = request.form['password']
         # Ensure the username is long enough
@@ -168,9 +168,9 @@ def register():
 
 # Login
 
-# Route for login (page)
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Handle user logins"""
     if request.method == 'POST':
         # Retrieve the values entered into the form by the user
         username = request.form['username']
@@ -192,9 +192,9 @@ def login():
 
 # Logout
 
-# Route for the current user to logout
 @app.route('/logout')
 def logout():
+    """Log the current user out"""
     # Remove all information from the current session
     session.clear()
     # Redirect the user to the home page after successful logout
@@ -202,24 +202,24 @@ def logout():
 
 # Error handlers
 
-# Error 403 custom handler page
 # This page displays when the user doesn't have correct access permissions
 @app.errorhandler(403)
-def forbidden(e):
+def forbidden(_error):
+    """Handle 403 handler custom page"""
     return render_template("403.html"), 403
 
 
-# Error 404 custom handler page
 # This page displays when the user goes to a page that doesn't exist
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found(_error):
+    """Error 404 handler custom page"""
     return render_template("404.html"), 404
 
 # Template context
 
-# Make the data of the current logged in user available to all HTML templates
 @app.context_processor
 def inject_user():
+    """Make current user data available to all templates"""
     user = None
     # Checks if a user ID is stored in the current session
     if 'user_id' in session:
@@ -230,9 +230,9 @@ def inject_user():
 
 # Home page
 
-# Route for the site's index (home) page
 @app.route('/')
 def home():
+    """Display the home page"""
     # Retrieve all albums and their details from the database
     sql = """SELECT * FROM album;"""
     albums = query_db(sql)
@@ -241,9 +241,9 @@ def home():
 
 # Albums
 
-# Route for albums page
 @app.route('/albums')
 def albums():
+    """Route for albums page"""
     # Retrieve all albums and their details from the database
     sql = """SELECT * FROM album;"""
     albums = query_db(sql)
@@ -251,9 +251,9 @@ def albums():
     return render_template("albums.html", active_page="albums", albums=albums)
 
 
-# Route for an individual album page
 @app.route('/album/<int:album_id>')
 def album(album_id):
+    """Route for individual album pages"""
     # Retrieve the album and its artists using SQL JOIN
     sql = """SELECT *
              FROM album
@@ -275,11 +275,14 @@ def album(album_id):
 
 # Review creation
 
-# Route to write an album review
 @app.route('/album/<int:album_id>/review', methods=['GET', 'POST'])
 def review(album_id):
+    """Route for review creation"""
     # Retrieve the selected album and its artist
-    sql = """SELECT * FROM Album JOIN Artist ON Album.artist_id = Artist.artist_id WHERE album_id = ?;"""
+    sql = """SELECT *
+             FROM Album
+             JOIN Artist ON Album.artist_id = Artist.artist_id
+             WHERE album_id = ?;"""
     # Calculate the average rating for the selected album
     average_rating_sql = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?;"""
     # Retrieve the value for the album's average rating and the album's details
@@ -315,11 +318,18 @@ def review(album_id):
                                    error="Your review contains words that are not allowed!")
         # Ensure the number rating is within the allowed range
         if rating < 0.1 or rating > 10:
-            return render_template("reviewer.html", album=album, error="Rating must be between 0.1 and 10.0!")
+            return render_template("reviewer.html",
+                                    album=album,
+                                    error="Rating must be between 0.1 and 10.0!")
         db = get_db()
         try:
             # Add the new review to the database
-            db.execute(review_sql, (session['user_id'], album_id, rating, review_text, date.today().strftime('%d/%m/%Y')))
+            db.execute(review_sql,
+                       (session['user_id'],
+                       album_id,
+                       rating,
+                       review_text,
+                       date.today().strftime('%d/%m/%Y')))
             db.commit()
             # Redirect the user to the album's reviews after successful review creation
             return redirect(url_for('reviews', album_id=album_id))
@@ -335,26 +345,28 @@ def review(album_id):
 
 # All reviews
 
-# Route for all reviews page
 @app.route('/reviews')
 def all_reviews():
+    """Route for all reviews page"""
     # Retrieve reviews and their details
     review_sql = """
     SELECT
         Review.*,
         User.username,
-        user.profile_picture,
+        User.profile_picture,
         Album.album_title,
         Album.album_cover,
         Artist.artist_name,
-        COUNT(Comment.comment_id) AS comment_count
+        COUNT(DISTINCT Comment.comment_id)
+        + COUNT(DISTINCT Reply.reply_id) AS interaction_count
     FROM Review
     JOIN User ON Review.user_id = User.user_id
     JOIN Album ON Review.album_id = Album.album_id
     JOIN Artist ON Album.artist_id = Artist.artist_id
     LEFT JOIN Comment ON Review.review_id = Comment.review_id
+    LEFT JOIN Reply ON Comment.comment_id = Reply.comment_id
     GROUP BY Review.review_id
-    ORDER BY comment_count DESC;
+    ORDER BY interaction_count DESC;
     """
     # Execute the query
     reviews = query_db(review_sql)
@@ -362,9 +374,9 @@ def all_reviews():
 
 # Reviews for one album
 
-# Route to read the reviews for one album
 @app.route('/album/<int:album_id>/reviews')
 def reviews(album_id):
+    """Route to read the reviews for one album"""
     # Retrieve all reviews for one album
     sql = """SELECT Review.*,
                 User.username,
@@ -386,9 +398,9 @@ def reviews(album_id):
 
 # Individual reviews and comments
 
-# Route for one review's page
 @app.route("/review/<int:review_id>", methods=['GET', 'POST'])
 def review_page(review_id):
+    """Route for one review's page"""
     # Retrieve the details for one review
     sql = """SELECT
                 Review.*,
@@ -450,7 +462,12 @@ def review_page(review_id):
                                 comment_error="Your comment contains words that are not allowed!")
         db = get_db()
         # Add the new comment to the database
-        db.execute('INSERT INTO COMMENT (user_id, review_id, comment_text, comment_date) VALUES (?, ?, ?, ?)', (session['user_id'], review_id, comment_text, date.today().strftime('%d/%m/%Y')))
+        db.execute(
+            'INSERT INTO COMMENT '
+            '(user_id, review_id, comment_text, comment_date) '
+            'VALUES (?, ?, ?, ?)',
+            (session['user_id'], review_id, comment_text, date.today().strftime('%d/%m/%Y'))
+        )
         db.commit()
         # Redirect the user to the individual review page after successful comment posting
         return redirect(url_for('review_page', review_id=review_id))
@@ -458,9 +475,9 @@ def review_page(review_id):
 
 # Replies
 
-# Route for writing replies to comments
 @app.route('/comment/<int:comment_id>/reply', methods=['POST'])
 def reply_to_comment(comment_id):
+    """Route for writing replies to comments"""
     # Prevent reply posting if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -522,19 +539,23 @@ def reply_to_comment(comment_id):
                                reply_comment_id=comment_id,
                                reply_error="Your reply contains words that are not allowed!")
     db = get_db()
-    db.execute(reply_sql,
-               (session['user_id'],
-                comment_id,
-                reply_text,
-                date.today().strftime('%d/%m/%Y')))
+    db.execute(
+        reply_sql,
+        (
+            session['user_id'],
+            comment_id,
+            reply_text,
+            date.today().strftime('%d/%m/%Y')
+        )
+    )
     db.commit()
     return redirect(url_for('review_page', review_id=comment['review_id']))
 
 # Edit review
 
-# Route for editing a review
 @app.route('/review/<int:review_id>/edit', methods=['GET', 'POST'])
 def edit_review(review_id):
+    """Route for review editing"""
     # Prevent review editing if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -590,15 +611,15 @@ def edit_review(review_id):
 
 # Delete review
 
-# Route for deleting a review
 @app.route('/review/<int:review_id>/delete', methods=['POST'])
 def delete_review(review_id):
+    """Route for review deletion"""
     # Prevent review deletion if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
     # SQL query to retrieve review details
     review_sql = """SELECT * FROM Review WHERE review_id = ?"""
-    review = query_db(review_sql, (review_id,),True)
+    review = query_db(review_sql, (review_id,), True)
     # SQL query to delete the review and any comments or replies it has
     delete_sql = """DELETE FROM Review WHERE review_id = ?"""
     reply_delete_sql = """DELETE FROM Reply
@@ -626,9 +647,9 @@ def delete_review(review_id):
 
 # Delete comment
 
-# Route for deleting a comment
 @app.route('/comment/<int:comment_id>/delete', methods=['POST'])
 def delete_comment(comment_id):
+    """Route for comment deletion"""
     # Prevent comment deletion if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -655,9 +676,9 @@ def delete_comment(comment_id):
 
 # Delete reply
 
-# Route for deleting a reply
 @app.route('/reply/<int:reply_id>/delete', methods=['POST'])
 def delete_reply(reply_id):
+    """Route for reply deletion"""
     # Prevent reply deletion if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -685,9 +706,9 @@ def delete_reply(reply_id):
 
 # Artists
 
-# Route for artists page
 @app.route('/artists')
 def artists():
+    """Route for page that displays all artists"""
     # SQL query to get artists and all their details from the database
     sql = """SELECT * FROM artist;"""
     artists = query_db(sql)
@@ -695,15 +716,15 @@ def artists():
     return render_template("artists.html", active_page="artists", artists=artists)
 
 
-# Route for one artist's page
 @app.route('/artist/<int:artist_id>')
 def artist(artist_id):
+    """Route for one artist's page"""
     # SQL query to retrieve details for the selected artist
     artist_sql = """SELECT * FROM artist WHERE artist_id = ?;"""
     artist = query_db(artist_sql, (artist_id,), True)
     # Retrieve the albums made by the selected artist
     album_sql = """SELECT * FROM Album WHERE artist_id = ?"""
-    # Display the custom error 404 handler page if the artist doesn't exist 
+    # Display the custom error 404 handler page if the artist doesn't exist
     if artist is None:
         abort(404)
     albums = query_db(album_sql, (artist_id,))
@@ -712,9 +733,9 @@ def artist(artist_id):
 
 # Current user profile
 
-# Route for my profile page
 @app.route('/profile')
 def profile():
+    """Route for my profile page"""
     # The user must be logged in to view their profile
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -733,9 +754,9 @@ def profile():
 
 # Edit profile
 
-# Route for editing my profile
 @app.route('/profile/edit', methods=['GET', 'POST'])
 def edit_profile():
+    """Route for profile editing"""
     # Prevent profile editing if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -803,13 +824,13 @@ def edit_profile():
                             bio=bio,
                             error="That username is not allowed!")
         # SQL query to find accounts with the same username excluding the current user
-        takenusernamesql = """SELECT *
+        taken_username_sql = """SELECT *
                               FROM User
                               WHERE LOWER(username) = LOWER(?)
                               AND user_id != ?"""
-        takenusername = query_db(takenusernamesql, (username, session['user_id']), one=True)
+        taken_username = query_db(taken_username_sql, (username, session['user_id']), one=True)
         # Ensure the new username isn't already taken
-        if takenusername:
+        if taken_username:
             return render_template("edit_profile.html",
                             user=user,
                             username=username,
@@ -817,7 +838,7 @@ def edit_profile():
                             error="Username already taken!")
         # Process changes if either password field is filled in
         if current_password or new_password:
-            # Ensure both passwords fields are filled in
+            # Ensure both password fields are filled in
             if not current_password or not new_password:
                 return render_template("edit_profile.html",
                             user=user,
@@ -873,8 +894,9 @@ def edit_profile():
             profile_picture.save(filepath)
             # Retrieve the name of the old profile picture
             old_filename = user['profile_picture']
-            # Delete the old file if the previous image was uploaded by the user (not placeholder)
-            if old_filename.startswith(f"profile_{session['user_id']}.") and old_filename != new_filename:
+            # Delete the user's previous profile picture if it exists
+            profile_prefix = f"profile_{session['user_id']}."
+            if old_filename.startswith(profile_prefix) and old_filename != new_filename:
                 old_filepath = os.path.join('static', 'images', old_filename)
                 if os.path.exists(old_filepath):
                     os.remove(old_filepath)
@@ -899,9 +921,9 @@ def edit_profile():
 
 # Clear profile picture
 
-# Route for clearing profile picture
 @app.route('/profile/edit/clear-picture', methods=['POST'])
 def clear_profile_picture():
+    """Route for profile picture clearing"""
     # Prevent profile picture clearing if the user isn't logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
@@ -930,9 +952,9 @@ def clear_profile_picture():
 
 # Other user profiles
 
-# Route for other user profiles
 @app.route('/user/<int:user_id>')
 def user(user_id):
+    """Route for pages of other users"""
     # SQL query to retrieve the selected user's details
     sql = """SELECT * FROM User WHERE user_id = ?;"""
     # SQL query to retrieve all reviews written by the selected user
@@ -955,7 +977,6 @@ def user(user_id):
 
 # Run application
 
-# Run statement
 # Ensures that the server only starts when the Python file is being run
 if __name__ == "__main__":
     app.run(debug=True)
