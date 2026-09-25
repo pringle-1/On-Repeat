@@ -12,9 +12,8 @@ A social music site that allows users to:
 Created by Fibitius Chan
 """
 
-# Essential internal and external imports to ensure the app functions as intended
-
-# Internal library imports for database access, file handling, and generating secure random values
+# Standard library modules used for
+# database access, file handling, and generating secure random values
 import sqlite3
 import os
 import secrets
@@ -80,7 +79,7 @@ def get_db():
 
 
 def allowed_file(filename):
-    """Return True when a filename has an allowed image file exntesion"""
+    """Return True when a filename has an allowed image file extension"""
     # Split from the final dot so filenames containing dots earlier can still be checked properly
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -180,19 +179,19 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user_sql = """SELECT * FROM User WHERE LOWER(username) = LOWER(?)"""
-        user = query_db(user_sql, (username,), one=True)
+        user_record = query_db(user_sql, (username,), one=True)
         # Return the appropriate error if the user isn't found
-        if user is None:
+        if user_record is None:
             return render_template("login.html", username=username, error="User not found!")
         # Compare the submitted password with the stored password hash instead of
         # decrypting or retrieving the user's real password
-        if not check_password_hash(user['password'], password):
+        if not check_password_hash(user_record['password'], password):
             return render_template("login.html", username=username, error="Incorrect password!")
         # Store only the information needed to identify the logged in user
         # The ID is used later to authenticate certain actions including
         # creating, editing, and deleting content
-        session['user_id'] = user['user_id']
-        session['username'] = user['username']
+        session['user_id'] = user_record['user_id']
+        session['username'] = user_record['username']
         # Redirect the user to the home page after successful login
         return redirect(url_for('home'))
     return render_template("login.html")
@@ -230,7 +229,7 @@ def inject_user():
     user = None
     # The session contains the logged in user's ID
     # Retrieving the full database record here means templates can access current_user
-    # without every individiual route needing to retrieve the user separately
+    # without every individual route needing to retrieve the user separately
     if 'user_id' in session:
         # Retrieve that user's data from the database
         user = query_db("SELECT * FROM User WHERE user_id = ?", (session['user_id'],), one=True)
@@ -244,9 +243,9 @@ def home():
     """Display the home page"""
     # Retrieve all albums and their details from the database
     sql = """SELECT * FROM album;"""
-    albums = query_db(sql)
+    album_list = query_db(sql)
     # Displays the home page with album data passed to the home HTML template
-    return render_template("index.html", active_page="home", albums=albums)
+    return render_template("index.html", active_page="home", albums=album_list)
 
 # Albums
 
@@ -255,9 +254,9 @@ def albums():
     """Route for albums page"""
     # Retrieve all albums and their details from the database
     sql = """SELECT * FROM album;"""
-    albums = query_db(sql)
+    album_list = query_db(sql)
     # Displays the albums page with album data passed to the albums page HTML template
-    return render_template("albums.html", active_page="albums", albums=albums)
+    return render_template("albums.html", active_page="albums", albums=album_list)
 
 
 @app.route('/album/<int:album_id>')
@@ -271,11 +270,11 @@ def album(album_id):
     # Calculate the average rating for the selected album
     average_rating_sql = """SELECT AVG(rating) AS average_rating FROM Review WHERE album_id = ?;"""
     # Retrieve album information and its average rating
-    album = query_db(sql, (album_id,), True)
-    # If the requested reivew ID doesn't exist, stop processing the request
+    album_record = query_db(sql, (album_id,), True)
+    # If the requested album ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
-    if album is None:
+    if album_record is None:
         abort(404)
     average = query_db(average_rating_sql, (album_id,), one=True)
     average_rating = average['average_rating']
@@ -284,7 +283,7 @@ def album(album_id):
     # rounding because an album without reviews returns None when AVG() is used
     if average_rating is not None:
         average_rating = round(average_rating, 1)
-    return render_template("album.html", album=album, average_rating=average_rating)
+    return render_template("album.html", album=album_record, average_rating=average_rating)
 
 # Review creation
 
@@ -301,7 +300,7 @@ def review(album_id):
     # Retrieve the value for the album's average rating and the album's details
     average = query_db(average_rating_sql, (album_id,), one=True)
     average_rating = average['average_rating']
-    album = query_db(sql, (album_id,), True)
+    album_record = query_db(sql, (album_id,), True)
     # SQL query to add the new review to the database
     review_sql = """INSERT INTO Review (user_id,
                                         album_id,
@@ -309,10 +308,10 @@ def review(album_id):
                                         review_text,
                                         review_date)
                                 VALUES (?, ?, ?, ?, ?)"""
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested album ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
-    if album is None:
+    if album_record is None:
         abort(404)
     # Round the average rating to one decimal place
     if average_rating is not None:
@@ -325,7 +324,7 @@ def review(album_id):
             rating = float(request.form['rating'])
         except (TypeError, ValueError):
             return render_template("reviewer.html",
-                                    album=album,
+                                    review=review,
                                     average_rating=average_rating,
                                     error="Rating must be a number!"
             )
@@ -335,7 +334,7 @@ def review(album_id):
         # can't be bypassed just by changing the capitalisation of the letters
         if any(word in review_text.lower() for word in BANNED_WORDS):
             return render_template("reviewer.html",
-                                   album=album,
+                                   album=album_record,
                                    average_rating=average_rating,
                                    rating=rating,
                                    review_text=review_text,
@@ -344,7 +343,9 @@ def review(album_id):
         # Values outside of this range are rejected before they reach the database
         if rating < 0.1 or rating > 10:
             return render_template("reviewer.html",
-                                    album=album,
+                                    album=album_record,
+                                    rating=rating,
+                                    review_text=review_text,
                                     error="Rating must be between 0.1 and 10.0!")
         db = get_db()
         try:
@@ -361,12 +362,12 @@ def review(album_id):
         except sqlite3.IntegrityError:
             # Return the appropriate error if the user has already reviewed the album
             return render_template("reviewer.html",
-                                    album=album,
+                                    album=album_record,
                                     average_rating=average_rating,
                                     rating=rating,
                                     review_text=review_text,
                                     error="You have already reviewed this album!")
-    return render_template("reviewer.html", album=album, average_rating=average_rating)
+    return render_template("reviewer.html", album=album_record, average_rating=average_rating)
 
 # All reviews
 
@@ -393,8 +394,8 @@ def all_reviews():
     GROUP BY Review.review_id
     ORDER BY interaction_count DESC;
     """
-    reviews = query_db(review_sql)
-    return render_template("all_reviews.html", active_page="all_reviews", reviews=reviews)
+    review_list = query_db(review_sql)
+    return render_template("all_reviews.html", active_page="all_reviews", reviews=review_list)
 
 # Reviews for one album
 
@@ -415,7 +416,7 @@ def reviews(album_id):
     album = query_db(album_sql, (album_id,), True)
     # Retrieve all reviews for one album
     reviews = query_db(sql, (album_id,))
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested album ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if album is None:
@@ -461,7 +462,7 @@ def review_page(review_id):
                 WHERE comment_id = ?
                 ORDER BY reply_id ASC;"""
     review = query_db(sql, (review_id,), True)
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested review ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if review is None:
@@ -518,7 +519,7 @@ def reply_to_comment(comment_id):
                                       reply_text,
                                       reply_date)
                    VALUES (?, ?, ?, ?)"""
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested comment ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if comment is None:
@@ -545,7 +546,7 @@ def reply_to_comment(comment_id):
                            JOIN User ON Comment.user_id = User.user_id
                            WHERE review_id = ?
                            ORDER BY comment_id DESC;"""
-        reply_sql = """SELECT Reply.*, User.username, User.profile_picture
+        replies_sql = """SELECT Reply.*, User.username, User.profile_picture
                       FROM Reply
                       JOIN User ON Reply.user_id = User.user_id
                       WHERE comment_id = ?
@@ -558,7 +559,7 @@ def reply_to_comment(comment_id):
         comment_list = []
         for current_comment in comments:
             comment_data = dict(current_comment)
-            comment_data['replies'] = query_db(reply_sql, (current_comment['comment_id'],))
+            comment_data['replies'] = query_db(replies_sql, (current_comment['comment_id'],))
             comment_list.append(comment_data)
         comments = comment_list
         # Redirect the user to the individual review page
@@ -603,13 +604,13 @@ def edit_review(review_id):
     review = query_db(review_sql, (review_id,), True)
     # SQL query to update the review details
     edit_sql = """UPDATE Review SET rating = ?, review_text = ? WHERE review_id = ?"""
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested review ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if review is None:
         abort(404)
     # Users can only edit their own reviews
-    # Compare the reviwer's user ID with the current user's ID to prevent
+    # Compare the reviewer's user ID with the current user's ID to prevent
     # another user from deleting a review that isn't theirs by changing the URL
     # Display the custom error 403 handler page if the user isn't the review creator
     # A 403 response is used when the resource exists but the user lacks permission to modify it
@@ -625,8 +626,8 @@ def edit_review(review_id):
         try:
             rating = float(request.form['rating'])
         except (TypeError, ValueError):
-            return render_template("reviewer.html",
-                                    album=album,
+            return render_template("edit_review.html",
+                                    review=review,
                                     average_rating=average_rating,
                                     error="Rating must be a number!"
             )
@@ -672,13 +673,13 @@ def delete_review(review_id):
                               FROM Comment
                               WHERE review_id = ?)"""
     comment_delete_sql = """DELETE FROM Comment WHERE review_id = ?"""
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested review ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if review is None:
         abort(404)
     # Users can only delete their own reviews
-    # Compare the reviwer's user ID with the current user's ID to prevent
+    # Compare the reviewer's user ID with the current user's ID to prevent
     # another user from deleting a review that isn't theirs by changing the URL
     # Display the custom error 403 handler page if the user isn't the review creator
     # A 403 response is used when the resource exists but the user lacks permission to modify it
@@ -710,7 +711,7 @@ def delete_comment(comment_id):
     # SQL queries to delete the comment and its replies
     delete_sql = """DELETE FROM Comment WHERE comment_id = ?"""
     reply_delete_sql = """DELETE FROM Reply WHERE comment_id = ?"""
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested comment ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if comment is None:
@@ -741,13 +742,13 @@ def delete_reply(reply_id):
     # SQL query to retrieve the reply and its details
     reply_sql = """SELECT * FROM Reply WHERE reply_id = ?"""
     reply = query_db(reply_sql, (reply_id,), one=True)
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # SQL query to delete the reply
+    delete_sql = """DELETE FROM Reply WHERE reply_id = ?"""
+    # If the requested reply ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if reply is None:
         abort(404)
-    # SQL query to delete the reply
-    delete_sql = """DELETE FROM Reply WHERE reply_id = ?"""
     # Retrieve the review ID so the user can be
     # redirected to the correct page after successful deletion
     comment_sql = """SELECT review_id FROM Comment WHERE comment_id = ?"""
@@ -787,7 +788,7 @@ def artist(artist_id):
     artist = query_db(artist_sql, (artist_id,), True)
     # Retrieve the albums made by the selected artist
     album_sql = """SELECT * FROM Album WHERE artist_id = ?"""
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested artist ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if artist is None:
@@ -841,7 +842,7 @@ def edit_profile():
                                password = ?,
                                profile_picture = ?
                            WHERE user_id = ?"""
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested user ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if user is None:
@@ -1002,7 +1003,7 @@ def clear_profile_picture():
     user = query_db(user_sql, (session['user_id'],), one=True)
     # SQL query to replace the current image with the default placeholder image
     update_sql = """UPDATE User SET profile_picture = ? WHERE user_id = ?"""
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested user ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if user is None:
@@ -1041,7 +1042,7 @@ def user(user_id):
     # Find the user and the user's reviews
     user = query_db(sql, (user_id,), True)
     reviews = query_db(review_sql, (user_id,))
-    # If the requested reivew ID doesn't exist, stop processing the request
+    # If the requested user ID doesn't exist, stop processing the request
     # and display the custom error 404 page handler instead of allowing
     # the route to continue with missing data
     if user is None:
