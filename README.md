@@ -1,9 +1,3 @@
-Yeah, fair 😂. A school project README with an emoji every second line definitely gives off “AI-generated README” vibes.
-
- Here’s a more natural, simple version that looks like something a student would actually put on GitHub.
-
- README.md
-
 # On Repeat 12DTP
 
  On Repeat is a social music website created for 12DTP. Users can browse albums and artists, write reviews, and interact with other users through comments and replies.
