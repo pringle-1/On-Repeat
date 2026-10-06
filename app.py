@@ -5,18 +5,18 @@ A social music site that allows users to:
 - Create an account
 - Customise their account and profile with profile pictures and custom user bios
 - Review albums
+- Edit and delete their reviews
 - Comment on reviews
 - Reply to comments
-- Edit and delete their reviews, comments, and replies
 
 Created by Fibitius Chan
 """
 
 # Standard library modules used for
 # database access, file handling, and generating secure random values
-import sqlite3
 import os
 import secrets
+import sqlite3
 
 # External imports to support the app's functionality:
 # date: accurately get the current date for accounts, comments, and replies
@@ -41,7 +41,8 @@ load_dotenv()
 # Use SECRET_KEY from environment if it exists
 # Otherwise generate a random key for the application run
 # Used to securely sign session data
-secret_key = os.getenv('SECRET_KEY', secrets.token_hex(32))
+SECRET_KEY = os.getenv('SECRET_KEY', secrets.token_hex(32))
+app.config['SECRET_KEY'] = SECRET_KEY
 
 # Set important app settings in variables
 # DATABASE stores the name of the SQLite file
@@ -49,21 +50,18 @@ DATABASE = 'onrepeat.db'
 # ALLOWED_EXTENSIONS contains the file types users can upload
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
-# Set the secret key to securely store sessions
-app.config['SECRET_KEY'] = secret_key
-
 # Load word filter lists
 
 # Open bannedwords.txt and store each banned word in a list
 # strip() removes whitespace or newlines and lower() makes it so that the words are banned
 # regardless of capitalisation
-with open('bannedwords.txt', 'r', encoding='utf-8') as f:
-    BANNED_WORDS = [line.strip().lower() for line in f]
+with open('bannedwords.txt', 'r', encoding='utf-8') as word_file:
+    BANNED_WORDS = [line.strip().lower() for line in word_file]
 
 # Open badpasswords.txt and store each bad password in a list
 # Users cannot register with or update their passwords to these passwords as they are too common
-with open('badpasswords.txt', 'r', encoding='utf-8') as f:
-    BAD_PASSWORDS = [line.strip() for line in f]
+with open('badpasswords.txt', 'r', encoding='utf-8') as password_file:
+    BAD_PASSWORDS = [line.strip() for line in password_file]
 
 # Database functionality
 
@@ -98,13 +96,13 @@ def query_db(query, args=(), one=False):
     # Execute the query using shared database connection
     # The parameters are supplied separately from the SQL query to ensure that
     # user input isn't interpreted as SQL code
-    cur = get_db().execute(query, args)
+    cursor = get_db().execute(query, args)
     # Fetch all results before closing the cursor
-    rv = cur.fetchall()
-    cur.close()
+    rows = cursor.fetchall()
+    cursor.close()
     # Returning one row when requested makes this function reusable
     # for both single-record lookups and queries returning multiple records
-    return (rv[0] if rv else None) if one else rv
+    return (rows[0] if rows else None) if one else rows
 
 # Account registration
 
@@ -242,7 +240,7 @@ def inject_user():
 def home():
     """Display the home page"""
     # Retrieve all albums and their details from the database
-    sql = """SELECT * FROM album;"""
+    sql = """SELECT * FROM Album;"""
     album_list = query_db(sql)
     # Displays the home page with album data passed to the home HTML template
     return render_template("index.html", active_page="home", albums=album_list)
@@ -253,7 +251,7 @@ def home():
 def albums():
     """Route for albums page"""
     # Retrieve all albums and their details from the database
-    sql = """SELECT * FROM album;"""
+    sql = """SELECT * FROM Album;"""
     album_list = query_db(sql)
     # Displays the albums page with album data passed to the albums page HTML template
     return render_template("albums.html", active_page="albums", albums=album_list)
@@ -264,7 +262,7 @@ def album(album_id):
     """Route for individual album pages"""
     # Retrieve the album and its artists using SQL JOIN
     sql = """SELECT *
-             FROM album
+             FROM Album
              JOIN Artist ON Album.artist_id = Artist.artist_id
              WHERE album_id = ?;"""
     # Calculate the average rating for the selected album
@@ -324,7 +322,7 @@ def review(album_id):
             rating = float(request.form['rating'])
         except (TypeError, ValueError):
             return render_template("reviewer.html",
-                                    review=review,
+                                    album=album_record,
                                     average_rating=average_rating,
                                     error="Rating must be a number!"
             )
@@ -344,6 +342,7 @@ def review(album_id):
         if rating < 0.1 or rating > 10:
             return render_template("reviewer.html",
                                     album=album_record,
+                                    average_rating=average_rating,
                                     rating=rating,
                                     review_text=review_text,
                                     error="Rating must be between 0.1 and 10.0!")
@@ -437,7 +436,7 @@ def review_page(review_id):
                 Album.album_cover,
                 Artist.artist_id,
                 Artist.artist_name
-            FROM review
+            FROM Review
             JOIN User
             ON Review.user_id = User.user_id
             JOIN Album ON Review.album_id = Album.album_id
@@ -492,7 +491,7 @@ def review_page(review_id):
         db = get_db()
         # Add the new comment to the database
         db.execute(
-            'INSERT INTO COMMENT '
+            'INSERT INTO Comment '
             '(user_id, review_id, comment_text, comment_date) '
             'VALUES (?, ?, ?, ?)',
             (session['user_id'], review_id, comment_text, date.today().strftime('%d/%m/%Y'))
@@ -527,7 +526,7 @@ def reply_to_comment(comment_id):
     # Prevent reply posting if the reply contains banned words
     reply_text = request.form['reply_text']
     if any(word in reply_text.lower() for word in BANNED_WORDS):
-        # If the review contains banned words, retrieve the review and its comments again
+        # If the reply contains banned words, retrieve the review and its comments again
         # so that the error message can be displayed
         review_sql = """SELECT Review.*,
                                User.username,
@@ -553,7 +552,7 @@ def reply_to_comment(comment_id):
                       ORDER BY reply_id ASC;"""
         # Retrieve the review that has the comment being replied to
         review = query_db(review_sql, (comment['review_id'],), True)
-        # Retrieve all other comments that the review has
+        # Retrieve all comments that the review has
         comments = query_db(all_comment_sql, (comment['review_id'],))
         # Create a list containing the comments and all their replies
         comment_list = []
@@ -611,7 +610,7 @@ def edit_review(review_id):
         abort(404)
     # Users can only edit their own reviews
     # Compare the reviewer's user ID with the current user's ID to prevent
-    # another user from deleting a review that isn't theirs by changing the URL
+    # another user from editing a review that isn't theirs by changing the URL
     # Display the custom error 403 handler page if the user isn't the review creator
     # A 403 response is used when the resource exists but the user lacks permission to modify it
     if review['user_id'] != session['user_id']:
@@ -635,17 +634,19 @@ def edit_review(review_id):
         # Prevent review updating if the review contains banned words
         if any(word in review_text.lower() for word in BANNED_WORDS):
             return render_template("edit_review.html",
-                                review=review,
-                                average_rating=average_rating,
-                                review_text=review_text,
-                                rating=rating,
-                                error="Your edited review contains words that are not allowed!")
+                                    review=review,
+                                    average_rating=average_rating,
+                                    review_text=review_text,
+                                    rating=rating,
+                                    error="Your edited review contains words that are not allowed!")
         # Ensure the number rating is within the allowed range
         # Values outside of this range are rejected before they reach the database
         if rating < 0.1 or rating > 10.0:
             return render_template("edit_review.html",
                                    review=review,
                                    average_rating=average_rating,
+                                   rating=rating,
+                                   review_text=review_text,
                                    error="Rating must be between 0.1 and 10.0!")
         # Update the review details stored in the database
         db = get_db()
@@ -753,12 +754,11 @@ def delete_reply(reply_id):
     # redirected to the correct page after successful deletion
     comment_sql = """SELECT review_id FROM Comment WHERE comment_id = ?"""
     comment = query_db(comment_sql, (reply['comment_id'],), one=True)
-    # Display the custom error 403 handler page if the current user ID
-    # doesn't match the replier's user ID
+    if comment is None:
+        abort(404)
     # Users can only delete their own replies
     # Compare the replier's user ID with the current user's ID to prevent
     # another user from deleting a reply that isn't theirs by changing the URL
-    # Display the custom error 403 handler page if the user isn't the replier
     # A 403 response is used when the resource exists but the user lacks permission to modify it
     if reply['user_id'] != session['user_id']:
         abort(403)
@@ -774,7 +774,7 @@ def delete_reply(reply_id):
 def artists():
     """Route for page that displays all artists"""
     # SQL query to get artists and all their details from the database
-    sql = """SELECT * FROM artist;"""
+    sql = """SELECT * FROM Artist;"""
     artists = query_db(sql)
     # Display the all artists page
     return render_template("artists.html", active_page="artists", artists=artists)
@@ -784,7 +784,7 @@ def artists():
 def artist(artist_id):
     """Route for one artist's page"""
     # SQL query to retrieve details for the selected artist
-    artist_sql = """SELECT * FROM artist WHERE artist_id = ?;"""
+    artist_sql = """SELECT * FROM Artist WHERE artist_id = ?;"""
     artist = query_db(artist_sql, (artist_id,), True)
     # Retrieve the albums made by the selected artist
     album_sql = """SELECT * FROM Album WHERE artist_id = ?"""
@@ -859,24 +859,24 @@ def edit_profile():
         # Prevent bio updating if the new bio contains banned words
         if any(word in bio.lower() for word in BANNED_WORDS):
             return render_template("edit_profile.html",
-                            user=user,
-                            username=username,
-                            bio=bio,
-                            error="Your bio contains words that are not allowed!")
+                                    user=user,
+                                    username=username,
+                                    bio=bio,
+                                    error="Your bio contains words that are not allowed!")
         # Ensure the username is long enough
         if len(username) < 3:
             return render_template("edit_profile.html",
-                            user=user,
-                            username=username,
-                            bio=bio,
-                            error="Username must be at least 3 characters!")
+                                    user=user,
+                                    username=username,
+                                    bio=bio,
+                                    error="Username must be at least 3 characters!")
         # Ensure the username isn't too long
         if len(username) > 20:
             return render_template("edit_profile.html",
-                            user=user,
-                            username=username,
-                            bio=bio,
-                            error="Username must be 20 characters or less!")
+                                    user=user,
+                                    username=username,
+                                    bio=bio,
+                                    error="Username must be 20 characters or less!")
         # Ensure the username doesn't contain spaces
         if ' ' in username:
             return render_template("edit_profile.html",
@@ -1054,4 +1054,4 @@ def user(user_id):
 
 # Ensures that the server only starts when the Python file is being run
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
