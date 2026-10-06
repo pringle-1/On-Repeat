@@ -12,7 +12,6 @@
 - Rate albums from 0.1 to 10.0
 - Write, edit and delete reviews
 - Comment on reviews and reply to comments
-- Edit and delete your own comments and replies
 - View other users' profiles and reviews
 
  ## Built With
@@ -61,7 +60,3 @@ static/             CSS, images and profile pictures
  ## Security
 
  The application includes password hashing, parameterised SQL queries, user session management, content filtering, secure file handling and permission checks for editing and deleting user content.
-
- ## Author
-
- **Fibitius Chan**
