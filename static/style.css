@@ -1,11 +1,10 @@
 /* Import 'Be Vietnam' font for consistent text aesthetics throughout the interface */
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro&display=swap');
-/* Colour Palette */
+/* Colour Palette and variables */
 :root {
     --primary-purple: #5E3984;
     --primary-blue: #202F72;
     --darker-blue: #172564;
-    --darker-purple: #53118F;
     --lighter-purple: #7843CF;
     --border-purple: #9064DF;
     --dark-gray: #2A2A2A;
@@ -79,8 +78,12 @@ header {
     display: flex;
     align-items: center;
 }
+.navbar .navlinks li:last-child {
+    flex-shrink: 0;
+}
 .profile-button {
     display: block;
+    flex-shrink: 0;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -113,40 +116,46 @@ footer {
     text-decoration: underline;
 }
 .index-header {
-    grid-column: 1 / span 3;
+    grid-column: 1 / -1;
     justify-self: center;
     text-align: center;
-    height: 0.3rem;
+    line-height: 1;
     width: 26.5rem;
-    color: white;
+    color: var(--white);
     font-size: 3.4rem;
-    margin-top: 0.3rem;
+    margin: 0;
 }
 .index-container {
     background-color: var(--primary-purple);
     text-align: center;
     justify-content: center;
     align-items: center;
-    border: 5px solid black;
+    border: 5px solid var(--black);
     border-radius: 50px;
-    max-width: 68rem;
+    max-width: var(--content-width);
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2em;
-    margin: 0 auto 3.7rem auto;
+    margin: 0 auto 3.7rem;
     padding: 20px;
 }
 .index-card-container {
     background-color: var(--darker-blue);
-    border-radius: 35px;
-    border: 5px solid black;
-    min-height: 18.7rem;
+    border-radius: var(--large-radius);
+    border: 5px solid var(--black);
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
-.index-card-container img {
-    margin-bottom: 1.5rem;
+.index-card-image {
+    width: 80%;
     max-width: 12.8rem;
-    border-radius: 35px;
-    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--large-radius);
+    object-fit: cover;
 }
 
 /* Global Styling */
@@ -159,7 +168,7 @@ img {
 }
 a {
     color: var(--primary-blue);
-    transition: color var(--transition), opacity var(--transition)
+    transition: color var(--transition), opacity var(--transition);
 }
 a:hover {
     opacity: 0.8;
@@ -175,7 +184,7 @@ input[type="file"]::file-selector-button {
     color: var(--white);
     background-color: var(--primary-blue);
     border: 3px solid var(--black);
-    border-radius: 35px;
+    border-radius: var(--large-radius);
     padding: 0.5rem 1rem;
     margin-right: 0.8rem;
     cursor: pointer;
@@ -185,19 +194,6 @@ input[type="file"]::file-selector-button {
 input[type="file"]::file-selector-button:hover {
     background-color: var(--lighter-purple);
     transform: translateY(-2px);
-}
-button {
-    cursor: pointer;
-    transition: background-color var(--transition),
-                color var(--transition),
-                transform var(--transition),
-                box-shadow var(--transition);
-}
-button:hover {
-    transform: translateY(-2px);
-}
-button:active {
-    transform: translateY(0);
 }
 textarea {
     resize: none;
@@ -247,7 +243,7 @@ textarea {
 .auth-input {
     margin: 0;
     padding-left: 0.42rem;
-    color: white;
+    color: var(--white);
     background: transparent;
     font-family: 'Be Vietnam Pro', sans-serif;
     min-height: 1.8rem;
@@ -256,7 +252,7 @@ textarea {
     border-radius: 50px;
 }
 .auth-input::placeholder {
-    color: white;
+    color: var(--white);
     font-size: 0.85rem;
 }
 .auth-input:focus {
@@ -300,7 +296,7 @@ textarea {
     padding: 0.6rem;
     margin-top: 0.3rem;
     color: var(--dark-gray);
-    background-color: white;
+    background-color: var(--white);
     border-radius: 50px;
     cursor: pointer;
 }
@@ -330,13 +326,22 @@ input:not(.auth-input):focus, textarea:focus {
 button {
     color: var(--white);
     background-color: var(--primary-blue);
+    cursor: pointer;
     border: 3px solid var(--black);
-    border-radius: 35px;
+    border-radius: var(--large-radius);
     padding: 0.55rem 1.1rem;
     font-size: 1rem;
+    transition: background-color var(--transition),
+                color var(--transition),
+                transform var(--transition),
+                box-shadow var(--transition);
 }
 button:hover {
     background-color: var(--lighter-purple);
+    transform: translateY(-2px);
+}
+button:active {
+    transform: translateY(0);
 }
 button:focus-visible {
     outline: 3px solid var(--lighter-purple);
@@ -369,7 +374,7 @@ button:focus-visible {
     margin-bottom: 4rem;
     padding: 0.3rem 1.7rem;
     background-color: var(--primary-blue);
-    color: white;
+    color: var(--white);
     border-radius: 50px;
     text-decoration: none;
 }
@@ -384,16 +389,18 @@ button:focus-visible {
     padding: 3.7rem 2.5rem;
     width: 42.7rem;
     text-align: center;
-    border: 5px solid black;
-    border-radius: 35px;
+    border: 5px solid var(--black);
+    border-radius: var(--large-radius);
 }
 .profile-left {
     width: 300px;
-    flex-shrink: 0;
+    flex: 0 0 300px;
 }
 .profile-picture {
+    display: block;
     width: 300px;
     height: 300px;
+    aspect-ratio: 1 / 1;
     border-radius: 1.7rem;
     object-fit: cover;
 }
@@ -415,22 +422,19 @@ button:focus-visible {
     align-items: flex-start;
     text-align: left;
 }
-.bio {
-    overflow-wrap: anywhere;
-}
 .username {
     text-decoration: underline;
 }
 .profile-divider {
-    border-top: 3px solid black;
+    border-top: 3px solid var(--black);
     margin: 2rem 0;
 }
 .profile-reviews {
     display: flex;
     gap: 1.5rem;
     align-items: flex-start;
-    border: 3px solid black;
-    border-radius: 20px;
+    border: 3px solid var(--black);
+    border-radius: var(--standard-radius);
     padding: 1rem;
     margin-bottom: 1.5rem;
     text-align: left;
@@ -439,7 +443,7 @@ button:focus-visible {
     width: 100px;
     height: 100px;
     object-fit: cover;
-    border: 3px solid black;
+    border: 3px solid var(--black);
     border-radius: 10px;
 }
 .profile-reviews-right {
@@ -472,7 +476,6 @@ button:focus-visible {
     background-color: var(--lighter-purple);
     width: min(var(--content-width), 90vw);
     min-height: 5rem;
-    box-sizing: border-box;
     font-size: 3.4rem;
     border: 5px solid var(--black);
     margin: 0.8rem 0 1.5rem;
@@ -486,7 +489,6 @@ button:focus-visible {
     border: 5px solid var(--black);
     border-radius: 50px;
     width: min(var(--content-width), 90vw);
-    box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2em;
@@ -496,16 +498,16 @@ button:focus-visible {
 .content-card img {
     margin-bottom: 1.5rem;
     max-width: 12.8rem;
-    border-radius: 35px;
+    border-radius: var(--large-radius);
     overflow: hidden;
-    border: 5px solid black;
+    border: 5px solid var(--black);
 }
 .content-card img:hover {
     transform: scale(1.03);
 }
 .content-header {
     font-size: 1.45rem;
-    color: white;
+    color: var(--white);
 }
 
 /* Information Styling (individual albums page and individual artists page) */
@@ -518,8 +520,8 @@ button:focus-visible {
     margin: 1.8rem 0;
     width: 51.2rem;
     text-align: center;
-    border: 5px solid black;
-    border-radius: 35px;
+    border: 5px solid var(--black);
+    border-radius: var(--large-radius);
 }
 .album-header {
     text-decoration: underline;
@@ -575,7 +577,7 @@ button:focus-visible {
     padding: 0.6rem 1rem;
     font-size: 1.2rem;
     border: 3px solid var(--black);
-    border-radius: 35px;
+    border-radius: var(--large-radius);
     transition: background-color var(--transition),
                 transform var(--transition);
 }
@@ -589,19 +591,18 @@ button:focus-visible {
     width: 300px;
     height: 300px;
     object-fit: cover;
-    border: 3px solid black;
+    border: 3px solid var(--black);
     border-radius: 1.7rem;
 }
 .artist-info {
     display: flex;
     gap: 2rem;
     align-items: flex-start;
-    width: min(68rem, 90vw);
+    width: min(var(--content-width), 90vw);
     margin: 1.8rem auto;
     padding: 2rem;
-    box-sizing: border-box;
-    border: 5px solid black;
-    border-radius: 35px;
+    border: 5px solid var(--black);
+    border-radius: var(--large-radius);
 }
 .artist-details {
     flex: 1;
@@ -610,18 +611,17 @@ button:focus-visible {
 .discography {
     grid-column: 1 / -1;
     width: 100%;
-    box-sizing: border-box;
-    color: white;
+    color: var(--white);
     font-size: 4.27rem;
     text-decoration: underline;
 }
 
-/* Review Styling (Write a Review for an individual album page) */
+/* Review Styling */
 .review-container {
     display: flex;
     justify-content: center;
 }
-/* Reviews Styling (Read reviews for an individual album page) */
+/* Reviews Styling */
 .reviews-container {
     display: flex;
     flex-direction: column;
@@ -662,7 +662,7 @@ button:focus-visible {
 .review-profile-picture {
     width: 80px;
     height: 80px;
-    border: 3px solid black;
+    border: 3px solid var(--black);
     border-radius: 50%;
     object-fit: cover;
 }
@@ -681,7 +681,7 @@ button:focus-visible {
     background-color: var(--primary-blue);
     text-decoration: none;
     border: 3px solid var(--black);
-    border-radius: 35px;
+    border-radius: var(--large-radius);
     padding: 0.55rem 1rem;
     transition: background-color var(--transition),
                 transform var(--transition);
@@ -691,9 +691,6 @@ button:focus-visible {
     background-color: var(--lighter-purple);
     transform: translateY(-2px);
     opacity: 1;
-}
-.comments-header {
-
 }
 .comment-form {
     width: min(69rem, 90vw);
@@ -710,7 +707,6 @@ button:focus-visible {
     display: flex;
     gap: 1.5rem;
     width: min(69rem, 90vw);
-    box-sizing: border-box;
     padding: 1.5rem;
     background-color: var(--white);
     border: 3px solid var(--black);
@@ -728,7 +724,7 @@ button:focus-visible {
 .comment-profile-picture {
     width: 60px;
     height: 60px;
-    border: 3px solid black;
+    border: 3px solid var(--black);
     border-radius: 50%;
     object-fit: cover;
 }
@@ -744,7 +740,6 @@ button:focus-visible {
     margin-top: 0.7rem;
     padding: 0.4rem 0.8rem;
 }
-.comment-text,
 .reply-text {
     margin-bottom: 0.5rem;
 }

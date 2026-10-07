@@ -1,80 +1,217 @@
 -- database: c:\Users\Fibitius Chan\OneDrive\Pictures\Files\School\'26\DTP\On Repeat\onrepeat.db
 -- Queries used in On Repeat
 
-
 -- TABLE CREATION --
--- Create User table to store account info
+-- Create User table to store account information
 CREATE TABLE User (
-  user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT UNIQUE,
-  password TEXT,
-  user_bio TEXT,
-  date_joined TEXT,
-  profile_picture TEXT
+user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+username TEXT UNIQUE,
+password TEXT,
+user_bio TEXT,
+date_joined TEXT,
+profile_picture TEXT
 );
--- Create Album table to store album info
-CREATE TABLE Album (
-  album_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  artist_id INTEGER,
-  album_title TEXT,
-  release_year INTEGER,
-  album_cover TEXT,
-  FOREIGN KEY (artist_id) REFERENCES Artist(artist_id)
-);
--- Create Comment table to store comments on albums from users
-CREATE TABLE Comment (
-  comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER,
-  review_id INTEGER,
-  comment_text TEXT,
-  comment_date TEXT,
-  FOREIGN KEY (user_id) REFERENCES User(user_id),
-  FOREIGN KEY (review_id) REFERENCES Review(review_id)
-);
--- Create Artist table to store artist info
+-- Create Artist table to store artist information
 CREATE TABLE Artist (
-    artist_id INTEGER,
-    artist_name TEXT,
-    artist_bio TEXT,
-    artist_image TEXT,
-    formation_year INTEGER,
-    PRIMARY KEY (artist_id)
+artist_id INTEGER PRIMARY KEY,
+artist_name TEXT,
+artist_bio TEXT,
+artist_image TEXT,
+formation_year INTEGER
+);
+-- Create Album table to store album information
+CREATE TABLE Album (
+album_id INTEGER PRIMARY KEY AUTOINCREMENT,
+artist_id INTEGER,
+album_title TEXT,
+release_year INTEGER,
+album_cover TEXT,
+FOREIGN KEY (artist_id) REFERENCES Artist(artist_id)
 );
 -- Create Review table to store album reviews
 CREATE TABLE Review (
-  review_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id INTEGER,
-  album_id INTEGER,
-  rating INTEGER,
-  review_text TEXT,
-  review_date TEXT,
-  FOREIGN KEY (user_id) REFERENCES User(user_id),
-  FOREIGN KEY (album_id) REFERENCES Album(album_id)
+review_id INTEGER PRIMARY KEY AUTOINCREMENT,
+user_id INTEGER,
+album_id INTEGER,
+rating INTEGER,
+review_text TEXT,
+review_date TEXT,
+FOREIGN KEY (user_id) REFERENCES User(user_id),
+FOREIGN KEY (album_id) REFERENCES Album(album_id)
+);
+-- Create Comment table to store comments on reviews
+CREATE TABLE Comment (
+comment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+user_id INTEGER,
+review_id INTEGER,
+comment_text TEXT,
+comment_date TEXT,
+FOREIGN KEY (user_id) REFERENCES User(user_id),
+FOREIGN KEY (review_id) REFERENCES Review(review_id)
+);
+-- Create Reply table to store replies to comments
+CREATE TABLE Reply (
+reply_id INTEGER PRIMARY KEY AUTOINCREMENT,
+user_id INTEGER,
+comment_id INTEGER,
+reply_text TEXT,
+reply_date TEXT,
+FOREIGN KEY (user_id) REFERENCES User(user_id),
+FOREIGN KEY (comment_id) REFERENCES Comment(comment_id)
 );
 
-
 -- SELECT QUERIES --
--- Select an account and verify login credentials
-SELECT * FROM User WHERE username = ?;
--- Select the data of the user currently logged in to display across all pages
-SELECT * FROM User WHERE user_id = ?;
--- Select all albums to display on albums page
+-- Select an account and retrieve its login details
+SELECT * FROM User
+WHERE LOWER(username) = LOWER(?);
+-- Select the currently logged in user's information
+SELECT * FROM User
+WHERE user_id = ?;
+-- Select all albums
 SELECT * FROM Album;
--- Select a single album by ID to display a page for it individually
-SELECT * FROM Album WHERE album_id = ?;
--- Select all artists to display on artists page
+-- Select a single album by ID
+SELECT * FROM Album
+WHERE album_id = ?;
+-- Select all artists
 SELECT * FROM Artist;
--- Select a single artist by ID to display a page for it individually
-SELECT * FROM Artist WHERE artist_id = ?;
--- Select all of a particular artist's albums for their discography
-SELECT * FROM Album WHERE artist_id = ?;
-
+-- Select a single artist by ID
+SELECT * FROM Artist
+WHERE artist_id = ?;
+-- Select all albums belonging to an artist
+SELECT * FROM Album
+WHERE artist_id = ?;
+-- Select all reviews for an album
+SELECT Review.*,
+User.username,
+User.profile_picture
+FROM Review
+JOIN User ON Review.user_id = User.user_id
+WHERE album_id = ?
+ORDER BY review_id DESC;
+-- Select a single review and its album and artist information
+SELECT Review.*,
+User.username,
+User.profile_picture,
+Album.album_title,
+Album.album_cover,
+Artist.artist_id,
+Artist.artist_name
+FROM Review
+JOIN User ON Review.user_id = User.user_id
+JOIN Album ON Review.album_id = Album.album_id
+JOIN Artist ON Album.artist_id = Artist.artist_id
+WHERE review_id = ?;
+-- Select all comments belonging to a review
+SELECT Comment.*,
+User.username,
+User.profile_picture
+FROM Comment
+JOIN User ON Comment.user_id = User.user_id
+WHERE review_id = ?
+ORDER BY comment_id DESC;
+-- Select all replies belonging to a comment
+SELECT Reply.*,
+User.username,
+User.profile_picture
+FROM Reply
+JOIN User ON Reply.user_id = User.user_id
+WHERE comment_id = ?
+ORDER BY reply_id ASC;
+-- Calculate the average rating for an album
+SELECT AVG(rating) AS average_rating
+FROM Review
+WHERE album_id = ?;
+-- Select all reviews written by a user
+SELECT Review.*,
+Album.album_title,
+Album.album_cover
+FROM Review
+JOIN Album ON Review.album_id = Album.album_id
+WHERE Review.user_id = ?
+ORDER BY Review.review_date DESC;
+-- Select a comment by ID
+SELECT * FROM Comment
+WHERE comment_id = ?;
+-- Select a reply by ID
+SELECT * FROM Reply
+WHERE reply_id = ?;
+-- Find another user with the same username
+SELECT *
+FROM User
+WHERE LOWER(username) = LOWER(?)
+AND user_id != ?;
+-- Select the profile picture belonging to a user
+SELECT profile_picture
+FROM User
+WHERE user_id = ?;
 
 -- INSERT QUERIES --
--- Insert user input into the database to create a new account
-INSERT INTO User (username, password, date_joined) VALUES (?, ?, ?);
+-- Create a new user account
+INSERT INTO User
+(username, password, date_joined)
+VALUES (?, ?, ?);
+-- Create a new review
+INSERT INTO Review
+(user_id, album_id, rating, review_text, review_date)
+VALUES (?, ?, ?, ?, ?);
+-- Create a new comment
+INSERT INTO Comment
+(user_id, review_id, comment_text, comment_date)
+VALUES (?, ?, ?, ?);
+-- Create a new reply
+INSERT INTO Reply
+(user_id, comment_id, reply_text, reply_date)
+VALUES (?, ?, ?, ?);
 
--- TABLE ALTERATION --
--- Alter the reviews table to have unique column combinations between user_id and album_id
+-- UPDATE QUERIES --
+-- Update a user's profile without changing their password
+UPDATE User
+SET username = ?,
+user_bio = ?,
+profile_picture = ?
+WHERE user_id = ?;
+-- Update a user's profile including their password
+UPDATE User
+SET username = ?,
+user_bio = ?,
+password = ?,
+profile_picture = ?
+WHERE user_id = ?;
+-- Replace a user's profile picture with the default placeholder
+UPDATE User
+SET profile_picture = ?
+WHERE user_id = ?;
+-- Update an existing review
+UPDATE Review
+SET rating = ?,
+review_text = ?
+WHERE review_id = ?;
+
+-- DELETE QUERIES --
+-- Delete all replies belonging to comments on a review
+DELETE FROM Reply
+WHERE comment_id IN (
+SELECT comment_id
+FROM Comment
+WHERE review_id = ?
+);
+-- Delete all comments belonging to a review
+DELETE FROM Comment
+WHERE review_id = ?;
+-- Delete a review
+DELETE FROM Review
+WHERE review_id = ?;
+-- Delete all replies belonging to a comment
+DELETE FROM Reply
+WHERE comment_id = ?;
+-- Delete a comment
+DELETE FROM Comment
+WHERE comment_id = ?;
+-- Delete a reply
+DELETE FROM Reply
+WHERE reply_id = ?;
+
+-- TABLE ALTERATION / CONSTRAINTS --
+-- Prevent a user from reviewing the same album more than once
 CREATE UNIQUE INDEX unique_column_combination
 ON Review(user_id, album_id);

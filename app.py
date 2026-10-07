@@ -1054,4 +1054,4 @@ def user(user_id):
 
 # Ensures that the server only starts when the Python file is being run
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
